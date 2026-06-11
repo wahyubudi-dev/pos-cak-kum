@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Search } from "lucide-react";
+import { Clock, Search } from "lucide-react";
 
 type GreetingHeaderProps = {
   tableNumber: string | null;
@@ -60,6 +60,17 @@ export function GreetingHeader({
             </span>
           ) : null}
 
+          <Link
+            href={
+              tableNumber
+                ? `/order/history?table=${encodeURIComponent(tableNumber)}`
+                : "/order/history"
+            }
+            aria-label="Riwayat pesanan"
+            className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-white text-muted-foreground shadow-sm transition-colors hover:bg-pearl hover:text-foreground"
+          >
+            <Clock className="h-4 w-4" aria-hidden="true" />
+          </Link>
           <Link
             href={`${returnPath}#menu-search`}
             aria-label="Cari menu"

@@ -2,7 +2,6 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { FireStack } from "@/components/menu/fire-stack";
-import { LoveStack } from "@/components/menu/love-stack";
 import { formatRupiah } from "@/lib/format";
 import type { MenuWithPopularity } from "@/lib/menus/queries";
 
@@ -67,11 +66,6 @@ export function MenuRow({ menu, tableNumber, showFire = false }: MenuRowProps) {
         >
           {formatRupiah(Number(menu.price))}
         </p>
-      </div>
-
-      {/* Love stack */}
-      <div className="shrink-0 self-start pt-1">
-        <LoveStack popularity={menu.popularity} />
       </div>
     </Link>
   );

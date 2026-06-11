@@ -197,7 +197,7 @@ function QuantityStepper({
         type="button"
         size="sm"
         variant="ghost"
-        className="h-8 w-8 rounded-full p-0"
+        className="h-7 w-7 rounded-full p-0"
         onClick={onDecrement}
         disabled={disabled || quantity <= 1}
         aria-label="Kurangi jumlah"
@@ -211,7 +211,7 @@ function QuantityStepper({
         type="button"
         size="sm"
         variant="ghost"
-        className="h-8 w-8 rounded-full p-0"
+        className="h-7 w-7 rounded-full p-0"
         onClick={onIncrement}
         disabled={disabled || quantity >= MAX_QUANTITY}
         aria-label="Tambah jumlah"

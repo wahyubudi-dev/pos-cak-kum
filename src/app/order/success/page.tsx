@@ -1,11 +1,16 @@
 import Link from "next/link";
+import { notFound } from "next/navigation";
+import { Check, Clock, ChefHat, BellRing, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { getOrderByOrderNumber } from "@/lib/orders/queries";
+import { ORDER_STATUS_LABELS } from "@/lib/orders/status";
+import type { OrderStatus } from "@/lib/db/schema";
 
 type SearchParams = Promise<{ number?: string }>;
 
 export const metadata = {
-  title: "Pesanan diterima · Kedai Cak Kum",
+  title: "Detail Pesanan · Kedai Cak Kum",
 };
 
 export default async function OrderSuccessPage({
@@ -14,116 +19,104 @@ export default async function OrderSuccessPage({
   searchParams: SearchParams;
 }) {
   const { number } = await searchParams;
-  const formattedNumber = number
-    ? `#${number.padStart(3, "0")}`
-    : null;
+
+  if (!number) notFound();
+
+  const orderNumber = parseInt(number, 10);
+  if (Number.isNaN(orderNumber)) notFound();
+
+  const order = await getOrderByOrderNumber(orderNumber);
+  if (!order) notFound();
+
+  const isCancelled = order.status === "cancelled";
+  const formattedNumber = `#${number.padStart(3, "0")}`;
 
   return (
     <main className="relative flex min-h-screen flex-col items-center justify-center bg-background px-5 py-14 sm:px-6">
-      {/* subtle background decoration */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <div className="absolute -left-20 -top-20 h-60 w-60 rounded-full bg-brand-teal/5 blur-3xl" />
         <div className="absolute -bottom-20 -right-20 h-60 w-60 rounded-full bg-mint-wash/30 blur-3xl" />
       </div>
 
       <div className="relative mx-auto flex w-full max-w-sm flex-col items-center gap-6 rounded-3xl border border-border bg-card px-6 py-10 text-center sm:px-7 sm:py-12">
-        {/* success icon */}
-        <div className="flex h-14 w-14 items-center justify-center rounded-full bg-brand-teal shadow-subtle sm:h-14 sm:w-14">
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="white"
-            strokeWidth={3}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="h-6 w-6 sm:h-7 sm:w-7"
-          >
-            <polyline points="20 6 9 17 4 12" />
-          </svg>
-        </div>
+        {/* status icon */}
+        {isCancelled ? (
+          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-red-100 shadow-sm">
+            <X className="h-6 w-6 text-red-600 sm:h-7 sm:w-7" strokeWidth={3} />
+          </div>
+        ) : (
+          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-brand-teal shadow-subtle">
+            <Check className="h-6 w-6 text-white sm:h-7 sm:w-7" strokeWidth={3} />
+          </div>
+        )}
 
         <div className="flex flex-col gap-2">
           <h1 className="font-display text-[22px] font-semibold tracking-tight sm:text-[26px]">
-            Pesanan diterima
+            {isCancelled ? "Pesanan dibatalkan" : "Pesanan diterima"}
           </h1>
-          <p className="text-[11px] text-muted-foreground">
-            Terima kasih sudah memesan di Cak Kum. Tim dapur akan
-            memverifikasi pembayaran lalu mulai menyiapkan pesanan kamu.
+          <p className="text-[11px] text-muted-foreground px-2">
+            {isCancelled
+              ? "Pesanan ini telah dibatalkan."
+              : "Terima kasih sudah memesan di Cak Kum. Tim dapur akan memverifikasi pembayaran lalu mulai menyiapkan pesanan kamu."}
           </p>
         </div>
 
-        {formattedNumber ? (
-          <div className="flex w-full flex-col items-center gap-1 rounded-2xl border border-dashed border-border bg-cream-paper/50 px-5 py-4">
-            <span className="text-[10px] uppercase tracking-[0.12em] font-medium text-muted-foreground">
-              Nomor pesanan
-            </span>
-            <span className="font-display text-[28px] font-bold tabular-nums text-foreground sm:text-[32px]">
-              {formattedNumber}
-            </span>
-          </div>
+        {order.tableNumber ? (
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-cream-paper/60 px-3 py-1 text-[11px] font-semibold text-foreground">
+            Meja {order.tableNumber}
+          </span>
         ) : null}
 
-        {/* status timeline */}
-        <div className="flex w-full flex-col gap-3">
-          <div className="flex items-start gap-3">
-            <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand-teal/10">
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={2.5}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="h-3 w-3 text-brand-teal"
-              >
-                <polyline points="20 6 9 17 4 12" />
-              </svg>
-            </div>
-            <div className="flex flex-col gap-0.5 text-left">
-              <span className="text-[12px] font-medium text-foreground">Pembayaran diverifikasi</span>
-              <span className="text-[10px] text-muted-foreground">Staf akan cek pembayaran kamu</span>
-            </div>
+        <div className="flex w-full flex-col items-center gap-1 rounded-2xl border border-dashed border-border bg-cream-paper/50 px-5 py-4">
+          <span className="text-[10px] uppercase tracking-[0.12em] font-medium text-muted-foreground">
+            Nomor pesanan
+          </span>
+          <span className="font-display text-[28px] font-bold tabular-nums text-foreground sm:text-[32px]">
+            {formattedNumber}
+          </span>
+        </div>
+
+        {/* dynamic status timeline */}
+        <div className="flex w-full flex-col gap-3 text-left">
+          <TimelineStep
+            step={1}
+            status={order.status}
+            label="Pembayaran diverifikasi"
+            desc="Staf akan cek pembayaran kamu"
+          />
+          <div
+            className="ml-2.5 h-4 w-0.5 rounded-full"
+            style={{ backgroundColor: connectorColor(1, order.status) ? "var(--color-brand-teal)" : "var(--color-border)" }}
+          />
+          <TimelineStep
+            step={2}
+            status={order.status}
+            label="Pesanan dimasak"
+            desc="Tim dapur mulai menyiapkan"
+          />
+          <div
+            className="ml-2.5 h-4 w-0.5 rounded-full"
+            style={{ backgroundColor: connectorColor(2, order.status) ? "var(--color-brand-teal)" : "var(--color-border)" }}
+          />
+          <TimelineStep
+            step={3}
+            status={order.status}
+            label="Siap disajikan"
+            desc="Pesanan diantar ke meja kamu"
+          />
+        </div>
+
+        {/* status card */}
+        <div className="flex w-full items-center justify-between rounded-2xl border border-border bg-white px-4 py-3.5">
+          <div className="flex items-center gap-2.5">
+            <span className="text-[10px] font-medium uppercase tracking-[0.08em] text-muted-foreground">
+              Status
+            </span>
+            <StatusDot status={order.status} />
           </div>
-          <div className="ml-2.5 h-4 w-0.5 rounded-full bg-border" />
-          <div className="flex items-start gap-3">
-            <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-muted">
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={2.5}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="h-3 w-3 text-muted-foreground"
-              >
-                <path d="M12 5v14M5 12h14" />
-              </svg>
-            </div>
-            <div className="flex flex-col gap-0.5 text-left">
-              <span className="text-[12px] font-medium text-foreground">Pesanan dimasak</span>
-              <span className="text-[10px] text-muted-foreground">Tim dapur mulai menyiapkan</span>
-            </div>
-          </div>
-          <div className="ml-2.5 h-4 w-0.5 rounded-full bg-border" />
-          <div className="flex items-start gap-3">
-            <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-muted">
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={2.5}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="h-3 w-3 text-muted-foreground"
-              >
-                <path d="M5 12h14M12 5l7 7-7 7" />
-              </svg>
-            </div>
-            <div className="flex flex-col gap-0.5 text-left">
-              <span className="text-[12px] font-medium text-foreground">Siap disajikan</span>
-              <span className="text-[10px] text-muted-foreground">Pesanan diantar ke meja kamu</span>
-            </div>
-          </div>
+          <span className="text-[13px] font-semibold text-foreground">
+            {ORDER_STATUS_LABELS[order.status]}
+          </span>
         </div>
 
         <p className="text-[10px] text-muted-foreground">
@@ -131,10 +124,119 @@ export default async function OrderSuccessPage({
           tambahan kapan pun.
         </p>
 
-        <Button asChild size="cta" variant="primary" className="w-full text-xs shadow-subtle hover:-translate-y-0.5 active:translate-y-0">
+        <Button
+          asChild
+          size="cta"
+          variant="primary"
+          className="w-full text-xs shadow-subtle hover:-translate-y-0.5 active:translate-y-0"
+        >
           <Link href="/menu">Pesan lagi</Link>
         </Button>
       </div>
     </main>
   );
+}
+
+/* ─── Timeline Step ──────────────────────────────────────────── */
+
+function TimelineStep({
+  step,
+  status,
+  label,
+  desc,
+}: {
+  step: 1 | 2 | 3;
+  status: OrderStatus;
+  label: string;
+  desc: string;
+}) {
+  const checked = isStepCompleted(step, status);
+  const cancelled = status === "cancelled" && step === 1;
+
+  if (cancelled) {
+    return (
+      <div className="flex items-start gap-3">
+        <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-red-100">
+          <X className="h-3 w-3 text-red-600" strokeWidth={2.5} />
+        </div>
+        <div className="flex flex-col gap-0.5">
+          <span className="text-[12px] font-medium text-red-600">
+            Pesanan dibatalkan
+          </span>
+          <span className="text-[10px] text-muted-foreground">{desc}</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (checked) {
+    return (
+      <div className="flex items-start gap-3">
+        <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand-teal/10">
+          <Check className="h-3 w-3 text-brand-teal" strokeWidth={2.5} />
+        </div>
+        <div className="flex flex-col gap-0.5">
+          <span className="text-[12px] font-medium text-foreground">
+            {label}
+          </span>
+          <span className="text-[10px] text-muted-foreground">{desc}</span>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex items-start gap-3">
+      <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-muted">
+        <div className="h-2 w-2 rounded-full bg-muted-foreground/30" />
+      </div>
+      <div className="flex flex-col gap-0.5">
+        <span className="text-[12px] font-medium text-muted-foreground">
+          {label}
+        </span>
+        <span className="text-[10px] text-muted-foreground">{desc}</span>
+      </div>
+    </div>
+  );
+}
+
+/* ─── helpers ────────────────────────────────────────────────── */
+
+function isStepCompleted(step: 1 | 2 | 3, status: OrderStatus): boolean {
+  if (status === "cancelled") return false;
+
+  switch (step) {
+    case 1:
+      return true; // always checked for non-cancelled
+    case 2:
+      return ["processing", "ready", "completed"].includes(status);
+    case 3:
+      return status === "completed";
+  }
+}
+
+function connectorColor(stepIndex: 1 | 2, status: OrderStatus): boolean {
+  // Connector after step 1 is green if step 2 is completed
+  // Connector after step 2 is green if step 3 is completed
+  return isStepCompleted((stepIndex + 1) as 2 | 3, status);
+}
+
+function StatusDot({ status }: { status: OrderStatus }) {
+  if (status === "cancelled") {
+    return (
+      <div className="flex h-5 w-5 items-center justify-center rounded-full bg-red-100">
+        <X className="h-3 w-3 text-red-600" strokeWidth={2.5} />
+      </div>
+    );
+  }
+
+  const colorMap: Record<OrderStatus, string> = {
+    pending_confirmation: "bg-amber-400",
+    processing: "bg-blue-500",
+    ready: "bg-emerald-500",
+    completed: "bg-brand-teal",
+    cancelled: "",
+  };
+
+  return <div className={`h-2.5 w-2.5 rounded-full ${colorMap[status]}`} />;
 }

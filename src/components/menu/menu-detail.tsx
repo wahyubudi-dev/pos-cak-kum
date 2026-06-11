@@ -119,7 +119,7 @@ export function MenuDetail({
                   onClick={decrement}
                   disabled={quantity <= 1 || !isActive || isPending}
                   aria-label="Kurangi jumlah"
-                  className="flex h-8 w-8 items-center justify-center rounded-full border border-border bg-card text-foreground transition-colors hover:bg-pearl disabled:opacity-40"
+                  className="flex h-7 w-7 items-center justify-center rounded-full border border-border bg-card text-foreground transition-colors hover:bg-pearl disabled:opacity-40"
                 >
                   <Minus className="h-3.5 w-3.5" aria-hidden="true" />
                 </button>
@@ -135,7 +135,7 @@ export function MenuDetail({
                   onClick={increment}
                   disabled={quantity >= 99 || !isActive || isPending}
                   aria-label="Tambah jumlah"
-                  className="flex h-8 w-8 items-center justify-center rounded-full border border-border text-white transition-colors disabled:opacity-40"
+                  className="flex h-7 w-7 items-center justify-center rounded-full border border-border text-white transition-colors disabled:opacity-40"
                   style={{ background: "var(--color-brand-teal)" }}
                 >
                   <Plus className="h-3.5 w-3.5" aria-hidden="true" />

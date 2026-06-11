@@ -1,4 +1,4 @@
-import { count, desc, eq, gte, inArray, sql } from "drizzle-orm";
+import { and, count, desc, eq, gte, inArray, sql } from "drizzle-orm";
 
 import { db } from "@/lib/db";
 import { orders } from "@/lib/db/schema";
@@ -89,6 +89,81 @@ export async function getTodayStats(): Promise<{
     count: row?.total ?? 0,
     revenue: Number(row?.revenue ?? 0),
   };
+}
+
+/**
+ * Fetch orders for the current customer by user ID. Includes item snapshots
+ * with menu names. Ordered newest-first.
+ */
+export async function getOrdersByUser(
+  userId: string,
+  options?: {
+    tableNumber?: string | null;
+    limit?: number;
+  },
+) {
+  const filters = [eq(orders.userId, userId)];
+
+  if (options?.tableNumber) {
+    filters.push(eq(orders.tableNumber, options.tableNumber));
+  }
+
+  const rows = await db.query.orders.findMany({
+    where: and(...filters),
+    orderBy: [desc(orders.createdAt)],
+    limit: options?.limit ?? 20,
+    with: {
+      items: {
+        columns: {
+          id: true,
+          quantity: true,
+          unitPrice: true,
+          subtotal: true,
+          notes: true,
+        },
+        with: {
+          menu: {
+            columns: { id: true, name: true },
+          },
+        },
+      },
+    },
+  });
+
+  return rows;
+}
+
+/**
+ * Fetch a customer-facing order by its sequential order number.
+ * Returns minimal data needed for the order success / tracking page.
+ */
+export async function getOrderByOrderNumber(
+  orderNumber: number,
+): Promise<AdminOrder | null> {
+  const row = await db.query.orders.findFirst({
+    where: eq(orders.orderNumber, orderNumber),
+    with: {
+      customer: {
+        columns: { id: true, fullName: true, email: true },
+      },
+      items: {
+        columns: {
+          id: true,
+          quantity: true,
+          unitPrice: true,
+          subtotal: true,
+          notes: true,
+        },
+        with: {
+          menu: {
+            columns: { id: true, name: true },
+          },
+        },
+      },
+    },
+  });
+
+  return row ?? null;
 }
 
 /**
