@@ -5,6 +5,7 @@ import { toast } from "sonner";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { Input } from "@/components/ui/input";
 import { updateUserRole } from "@/lib/users/admin-actions";
 import { cn } from "@/lib/utils";
@@ -214,26 +215,38 @@ function UserRow({ user, isSelf }: { user: UserView; isSelf: boolean }) {
         </div>
       </div>
 
-      <Button
-        type="button"
-        size="sm"
-        variant={isAdmin ? "ghost" : "default"}
-        onClick={handleToggleRole}
-        disabled={isPending || isSelf}
-        className={cn(
-          "rounded-lg whitespace-nowrap",
+      <ConfirmDialog
+        trigger={
+          <Button
+            type="button"
+            size="sm"
+            variant={isAdmin ? "ghost" : "default"}
+            disabled={isPending || isSelf}
+            className={cn(
+              "rounded-lg whitespace-nowrap",
+              isAdmin
+                ? "text-destructive hover:bg-destructive/10 hover:text-destructive"
+                : "bg-brand-teal text-white hover:bg-brand-teal/90",
+            )}
+            title={isSelf ? "Tidak bisa mengubah role akun sendiri" : undefined}
+          >
+            {isPending
+              ? "..."
+              : isAdmin
+                ? "Turunkan ke Pelanggan"
+                : "Jadikan Admin"}
+          </Button>
+        }
+        title={isAdmin ? "Turunkan pengguna?" : "Jadikan admin?"}
+        description={
           isAdmin
-            ? "text-destructive hover:bg-destructive/10 hover:text-destructive"
-            : "bg-brand-teal text-white hover:bg-brand-teal/90",
-        )}
-        title={isSelf ? "Tidak bisa mengubah role akun sendiri" : undefined}
-      >
-        {isPending
-          ? "..."
-          : isAdmin
-            ? "Turunkan ke Pelanggan"
-            : "Jadikan Admin"}
-      </Button>
+            ? `${user.fullName ?? user.email} akan kehilangan akses admin dan menjadi pelanggan biasa.`
+            : `${user.fullName ?? user.email} akan mendapatkan akses penuh ke panel admin.`
+        }
+        confirmLabel={isAdmin ? "Turunkan" : "Jadikan Admin"}
+        tone={isAdmin ? "destructive" : "default"}
+        onConfirm={handleToggleRole}
+      />
     </article>
   );
 }

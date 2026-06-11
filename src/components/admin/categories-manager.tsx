@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import {
@@ -41,12 +41,12 @@ function CreateCategoryForm() {
     INITIAL_STATE,
   );
 
-  // Surface success / error toasts when the action settles.
-  if (state.message) {
-    if (state.ok) toast.success(state.message);
-    else toast.error(state.message);
-    state.message = undefined;
-  }
+  useEffect(() => {
+    if (state.message) {
+      if (state.ok) toast.success(state.message);
+      else toast.error(state.message);
+    }
+  }, [state]);
 
   return (
     <form
@@ -158,16 +158,16 @@ function EditCategoryForm({
     INITIAL_STATE,
   );
 
-  if (state.message) {
-    if (state.ok) {
-      toast.success(state.message);
-      state.message = undefined;
-      onSaved();
-    } else {
-      toast.error(state.message);
-      state.message = undefined;
+  useEffect(() => {
+    if (state.message) {
+      if (state.ok) {
+        toast.success(state.message);
+        onSaved();
+      } else {
+        toast.error(state.message);
+      }
     }
-  }
+  }, [state, onSaved]);
 
   return (
     <form
