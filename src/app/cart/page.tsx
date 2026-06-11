@@ -28,26 +28,28 @@ export default async function CartPage({
 
   return (
     <main className="min-h-screen bg-background pb-32">
-      <header className="border-b border-border bg-card px-6 py-6">
-        <div className="mx-auto flex max-w-2xl flex-col gap-2">
+      <header className="border-b border-border bg-card py-5 sm:py-6">
+        <div className="mx-auto flex max-w-lg flex-col gap-2 px-5 sm:px-6">
           <Link
             href={backToMenuHref}
-            className="self-start text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground hover:text-foreground"
+            className="self-start text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground hover:text-foreground"
           >
             ← Kembali ke menu
           </Link>
-          <h1 className="font-display text-3xl font-semibold tracking-tight">
-            Keranjang
-          </h1>
-          {tableNumber ? (
-            <span className="self-start rounded-full bg-cream-paper px-3 py-1 text-xs font-medium text-foreground">
-              Meja {tableNumber}
-            </span>
-          ) : null}
+          <div className="flex items-center gap-3">
+            <h1 className="font-display text-[18px] font-semibold tracking-tight sm:text-[22px]">
+              Keranjang
+            </h1>
+            {tableNumber ? (
+              <span className="rounded-full bg-cream-paper px-3 py-0.5 text-[10px] font-medium text-foreground shadow-subtle">
+                Meja {tableNumber}
+              </span>
+            ) : null}
+          </div>
         </div>
       </header>
 
-      <div className="mx-auto flex max-w-2xl flex-col gap-6 px-6 py-8">
+      <div className="mx-auto flex max-w-lg flex-col gap-5 px-5 py-6 sm:gap-6 sm:px-6 sm:py-7">
         {cart.items.length === 0 ? (
           <EmptyCart backToMenuHref={backToMenuHref} />
         ) : (
@@ -75,6 +77,8 @@ export default async function CartPage({
               ))}
             </ul>
 
+            <hr className="border-t border-dashed border-border" />
+
             <CartSummary
               totalAmount={cart.totalAmount}
               totalQuantity={cart.totalQuantity}
@@ -91,10 +95,10 @@ export default async function CartPage({
 function EmptyCart({ backToMenuHref }: { backToMenuHref: string }) {
   return (
     <div className="flex flex-col items-center gap-4 rounded-3xl border border-dashed border-border bg-card px-6 py-16 text-center">
-      <p className="font-display text-xl font-semibold text-foreground">
+      <p className="font-display text-[18px] font-semibold text-foreground sm:text-[22px]">
         Keranjang masih kosong
       </p>
-      <p className="max-w-sm text-sm text-muted-foreground">
+      <p className="max-w-sm text-[13px] text-muted-foreground">
         Pilih menu dulu untuk menambahkannya ke keranjang.
       </p>
       <Button asChild size="cta" variant="primary">

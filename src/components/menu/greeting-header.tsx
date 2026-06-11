@@ -25,7 +25,7 @@ export function GreetingHeader({
         {/* Left: greeting */}
         <div className="min-w-0 flex flex-col gap-0.5">
           <h1
-            className="font-display text-base font-semibold leading-tight text-foreground"
+            className="font-display text-sm font-semibold leading-tight text-foreground"
             style={{ letterSpacing: "-0.03em" }}
           >
             Hallo, {greeting}
@@ -36,7 +36,7 @@ export function GreetingHeader({
               {/* Halo, {userName.split(" ")[0]} 👋, Mau pesen apa nih! */}
             </p>
           ) : (
-            <p className="text-[11px] text-muted-foreground leading-snug">
+            <p className="text-[10px] text-muted-foreground leading-snug">
               Mau pesen apa nih!
             </p>
           )}

@@ -45,19 +45,19 @@ export function MenuBrowser({
         onChange={setActiveTab}
       />
 
-      <div className="px-4 pt-4">
+      <div className="px-5 pt-4 sm:px-6">
         <label htmlFor="menu-search" className="sr-only">
           Cari menu
         </label>
         <div className="relative">
-          <Search className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Search className="pointer-events-none absolute top-1/2 left-3.5 h-3 w-3 -translate-y-1/2 text-muted-foreground" />
           <Input
             id="menu-search"
             type="search"
             value={searchQuery}
             onChange={(event) => setSearchQuery(event.target.value)}
             placeholder="Cari menu atau deskripsi"
-            className="h-11 rounded-full border-border bg-white pl-10"
+            className="h-9 rounded-full border-border bg-card pl-9 text-[12px] placeholder:text-[12px]"
           />
         </div>
       </div>

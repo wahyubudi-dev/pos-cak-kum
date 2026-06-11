@@ -53,7 +53,7 @@ export default async function MenuDetailPage({
     : `/menu/${id}`;
 
   return (
-    <main className="min-h-screen bg-background pb-56 sm:pb-64">
+    <main className="min-h-screen bg-background pb-44 sm:pb-80">
       {/* Sticky top header */}
       <header className="sticky top-0 z-30 border-b border-border bg-card/90 py-3 backdrop-blur-sm">
         <div className="mx-auto flex max-w-lg items-center justify-between gap-3 px-5 sm:px-6">
@@ -146,8 +146,8 @@ export default async function MenuDetailPage({
           {/* Name */}
           <div className="flex flex-col gap-2">
             <h1
-              className="font-display text-[22px] font-semibold text-foreground sm:text-[26px]"
-              style={{ letterSpacing: "-0.03em", lineHeight: 1.15 }}
+              className="font-display text-[18px] font-semibold text-foreground sm:text-[22px]"
+              style={{ letterSpacing: "-0.03em", lineHeight: 1.2 }}
             >
               {menu.name}
             </h1>
@@ -156,7 +156,7 @@ export default async function MenuDetailPage({
 
           {/* Description */}
           {menu.description ? (
-            <p className="max-w-[34ch] text-[15px] leading-7 text-muted-foreground sm:text-base">
+            <p className="max-w-[34ch] text-[13px] leading-6 text-muted-foreground sm:text-[15px]">
               {menu.description}
             </p>
           ) : null}

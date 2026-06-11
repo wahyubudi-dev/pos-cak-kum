@@ -51,7 +51,7 @@ export function MenuSections({
   }
 
   return (
-    <div className="flex flex-col gap-10 px-4">
+    <div className="flex flex-col gap-7 px-4">
       {/* Rekomendasi section — has a visible header */}
       {showFeaturedSection ? (
         <section

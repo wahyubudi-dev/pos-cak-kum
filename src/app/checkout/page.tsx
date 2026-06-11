@@ -32,12 +32,12 @@ export default async function CheckoutPage({
   // can fix things. /checkout never shows an "empty" state of its own.
   if (cart.items.length === 0) {
     return (
-      <main className="min-h-screen bg-background px-6 py-16">
-        <div className="mx-auto flex max-w-md flex-col items-center gap-4 rounded-3xl border border-dashed border-border bg-card px-6 py-16 text-center">
-          <p className="font-display text-xl font-semibold text-foreground">
+      <main className="min-h-screen bg-background px-5 py-16 sm:px-6">
+        <div className="mx-auto flex max-w-lg flex-col items-center gap-4 rounded-3xl border border-dashed border-border bg-card px-6 py-16 text-center">
+          <p className="font-display text-[18px] font-semibold text-foreground sm:text-[22px]">
             Tidak ada pesanan
           </p>
-          <p className="max-w-sm text-sm text-muted-foreground">
+          <p className="max-w-sm text-[13px] text-muted-foreground">
             Keranjang kamu masih kosong. Pilih menu dulu untuk lanjut ke
             pembayaran.
           </p>
@@ -55,12 +55,12 @@ export default async function CheckoutPage({
 
   if (cart.hasInactiveItem) {
     return (
-      <main className="min-h-screen bg-background px-6 py-16">
-        <div className="mx-auto flex max-w-md flex-col items-center gap-4 rounded-3xl border border-destructive/40 bg-card px-6 py-16 text-center">
-          <p className="font-display text-xl font-semibold text-foreground">
+      <main className="min-h-screen bg-background px-5 py-16 sm:px-6">
+        <div className="mx-auto flex max-w-lg flex-col items-center gap-4 rounded-3xl border border-destructive/40 bg-card px-6 py-16 text-center">
+          <p className="font-display text-[18px] font-semibold text-foreground sm:text-[22px]">
             Ada menu yang tidak tersedia
           </p>
-          <p className="max-w-sm text-sm text-muted-foreground">
+          <p className="max-w-sm text-[13px] text-muted-foreground">
             Hapus atau ganti item yang sudah tidak tersedia di keranjang
             sebelum kamu lanjut ke pembayaran.
           </p>
@@ -87,22 +87,29 @@ export default async function CheckoutPage({
     }));
 
   return (
-    <main className="min-h-screen bg-background pb-16">
-      <header className="border-b border-border bg-card px-6 py-6">
-        <div className="mx-auto flex max-w-2xl flex-col gap-2">
+    <main className="min-h-screen bg-background pb-32">
+      <header className="border-b border-border bg-card py-5 sm:py-6">
+        <div className="mx-auto flex max-w-lg flex-col gap-2 px-5 sm:px-6">
           <Link
             href={cartHref}
-            className="self-start text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground hover:text-foreground"
+            className="self-start text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground hover:text-foreground"
           >
             ← Kembali ke keranjang
           </Link>
-          <h1 className="font-display text-3xl font-semibold tracking-tight">
-            Checkout
-          </h1>
+          <div className="flex items-center gap-3">
+            <h1 className="font-display text-[18px] font-semibold tracking-tight sm:text-[22px]">
+              Checkout
+            </h1>
+            {tableNumber ? (
+              <span className="rounded-full bg-cream-paper px-3 py-0.5 text-[10px] font-medium text-foreground shadow-subtle">
+                Meja {tableNumber}
+              </span>
+            ) : null}
+          </div>
         </div>
       </header>
 
-      <div className="mx-auto max-w-2xl px-6 py-8">
+      <div className="mx-auto max-w-lg px-5 py-6 sm:px-6 sm:py-7">
         <CheckoutFlow
           items={checkoutItems}
           totalAmount={cart.totalAmount}

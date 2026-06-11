@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ShoppingBag } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { formatRupiah } from "@/lib/format";
@@ -12,7 +13,7 @@ type CartSummaryProps = {
 };
 
 /**
- * Sticky bottom bar with the running total and the Checkout CTA.
+ * Sticky bottom bar with the running total, item count, and the Checkout CTA.
  *
  * Disabled state covers two cases:
  *   - Empty cart: nothing to check out.
@@ -32,13 +33,13 @@ export function CartSummary({
 
   return (
     <div className="sticky bottom-4 z-20">
-      <div className="mx-auto max-w-2xl rounded-3xl border border-border bg-card p-4 shadow-subtle sm:p-6">
+      <div className="mx-auto max-w-lg rounded-3xl border border-border bg-white p-4 shadow-subtle sm:p-5">
         <div className="flex items-center justify-between gap-4">
           <div className="flex flex-col">
-            <span className="text-xs uppercase tracking-wide text-muted-foreground">
-              Total
+            <span className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground">
+              Total · {totalQuantity} item
             </span>
-            <span className="font-display text-2xl font-semibold text-foreground tabular-nums">
+            <span className="font-display text-[14px] font-semibold tabular-nums text-foreground sm:text-[14px]">
               {formatRupiah(totalAmount)}
             </span>
           </div>
@@ -49,17 +50,20 @@ export function CartSummary({
               size="cta"
               variant="primary"
               disabled
+              className="text-xs"
             >
-              Checkout
+              Lanjutkan Checkout
             </Button>
           ) : (
-            <Button asChild size="cta" variant="primary">
-              <Link href={checkoutHref}>Checkout</Link>
+            <Button asChild size="cta" variant="primary" className="gap-2.5 px-5 shadow-subtle hover:-translate-y-0.5 active:translate-y-0">
+              <Link href={checkoutHref} className="text-xs">
+                Lanjutkan Checkout
+              </Link>
             </Button>
           )}
         </div>
         {hasInactiveItem ? (
-          <p className="mt-3 text-xs text-destructive">
+          <p className="mt-3 text-[11px] text-destructive">
             Hapus item yang tidak tersedia sebelum melanjutkan ke pembayaran.
           </p>
         ) : null}

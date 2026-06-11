@@ -89,7 +89,7 @@ export default async function MenuPage({
 
 function EmptyState() {
   return (
-    <div className="mx-4 flex flex-col items-center gap-4 rounded-3xl border border-dashed border-border bg-card px-8 py-20 text-center">
+    <div className="mx-4 flex flex-col items-center gap-4 rounded-3xl border border-dashed border-border bg-card px-7 py-20 text-center">
       <div
         className="flex h-16 w-16 items-center justify-center rounded-2xl"
         style={{ background: "var(--color-cream-paper)" }}

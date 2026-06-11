@@ -144,7 +144,7 @@ function BannerSlide({
       }}
     >
       {/* Text content */}
-      <div className="flex flex-1 flex-col justify-between px-6 py-6 sm:px-8 sm:py-7">
+      <div className="flex flex-1 flex-col justify-between px-6 py-6 sm:py-7">
         <div className="flex flex-col gap-2 pr-2">
           <h2 className="font-display text-[18px] font-semibold text-foreground sm:text-xl">
             {banner.title}

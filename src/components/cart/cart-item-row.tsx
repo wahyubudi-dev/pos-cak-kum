@@ -96,7 +96,7 @@ export function CartItemRow({ item }: CartItemRowProps) {
   return (
     <article
       className={cn(
-        "flex gap-4 rounded-2xl border bg-card p-4",
+        "flex gap-3 rounded-2xl border bg-card p-3 sm:gap-4 sm:p-4",
         isInactive ? "border-destructive/40" : "border-border",
       )}
     >
@@ -107,7 +107,7 @@ export function CartItemRow({ item }: CartItemRowProps) {
             alt={menu.name}
             fill
             sizes="80px"
-            className={cn("object-cover", isInactive && "opacity-50")}
+            className={cn("object-contain p-1", isInactive && "opacity-50")}
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center text-[10px] uppercase tracking-wide text-muted-foreground">
@@ -120,7 +120,7 @@ export function CartItemRow({ item }: CartItemRowProps) {
         <div className="flex items-start justify-between gap-3">
           <div className="flex flex-col gap-1 min-w-0">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="font-medium text-foreground">
+              <span className="text-[12px] font-medium text-foreground">
                 {menu?.name ?? "Menu tidak tersedia"}
               </span>
               {isInactive ? (
@@ -133,13 +133,13 @@ export function CartItemRow({ item }: CartItemRowProps) {
               ) : null}
             </div>
             {menu ? (
-              <span className="text-sm text-muted-foreground">
+              <span className="text-xs text-muted-foreground">
                 {formatRupiah(menu.price)}
                 {quantity > 1 ? ` × ${quantity}` : ""}
               </span>
             ) : null}
           </div>
-          <span className="shrink-0 font-semibold tabular-nums text-foreground">
+          <span className="shrink-0 text-[12px] font-semibold tabular-nums">
             {formatRupiah(subtotal)}
           </span>
         </div>
@@ -168,7 +168,7 @@ export function CartItemRow({ item }: CartItemRowProps) {
             type="button"
             variant="ghost"
             size="sm"
-            className="rounded-lg text-destructive hover:bg-destructive/10 hover:text-destructive"
+            className="rounded-lg text-destructive hover:bg-destructive/10 hover:text-destructive text-[11px]"
             onClick={handleRemove}
             disabled={isPending}
           >
@@ -248,9 +248,10 @@ function NotesEditor({
           rows={2}
           maxLength={MAX_NOTES}
           placeholder='Misal: "tanpa bawang", "ekstra sambel"'
+          className="placeholder:text-xs"
         />
         <div className="flex items-center justify-between gap-3">
-          <span className="text-xs text-muted-foreground">
+          <span className="text-[12px] text-muted-foreground">
             {value.length}/{MAX_NOTES}
           </span>
           <div className="flex items-center gap-2">
@@ -258,7 +259,7 @@ function NotesEditor({
               type="button"
               size="sm"
               variant="ghost"
-              className="rounded-lg"
+              className="rounded-lg text-[11px]"
               onClick={onCancel}
               disabled={isPending}
             >
@@ -267,7 +268,7 @@ function NotesEditor({
             <Button
               type="button"
               size="sm"
-              className="rounded-lg bg-brand-teal text-white hover:bg-brand-teal/90"
+              className="rounded-lg bg-brand-teal text-white hover:bg-brand-teal/90 text-[11px]"
               onClick={onSave}
               disabled={isPending}
             >
@@ -283,7 +284,7 @@ function NotesEditor({
     return (
       <button
         type="button"
-        className="self-start text-xs font-medium text-muted-foreground hover:text-foreground"
+        className="self-start text-[11px] sm:text-[11px] font-medium text-muted-foreground hover:text-foreground"
         onClick={onStart}
       >
         + Tambah catatan

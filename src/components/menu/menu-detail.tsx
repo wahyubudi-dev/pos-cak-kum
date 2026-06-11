@@ -71,7 +71,7 @@ export function MenuDetail({
       <div className="flex flex-col gap-2">
         <label
           htmlFor="notes"
-          className="text-[15px] font-medium text-foreground sm:text-base"
+          className="text-[13px] font-medium text-foreground sm:text-[15px]"
         >
           Catatan <span className="font-normal text-muted-foreground">(opsional)</span>
         </label>
@@ -83,13 +83,16 @@ export function MenuDetail({
           rows={4}
           placeholder="Contoh: tanpa bawang, level pedas sedang..."
           disabled={!isActive || isPending}
-          className="min-h-32 w-full resize-none rounded-[24px] border border-border bg-card px-4 py-3.5 text-[15px] leading-6 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 disabled:opacity-50 sm:min-h-36 sm:px-5 sm:py-4 sm:text-base sm:leading-7"
+          className="min-h-28 w-full resize-none rounded-[24px] border border-border bg-card px-4 py-3.5 text-[13px] leading-5 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 disabled:opacity-50 sm:min-h-32 sm:px-5 sm:py-4 sm:text-[15px] sm:leading-6"
           style={{ focusRingColor: "var(--color-brand-teal)" } as React.CSSProperties}
         />
         <p className="text-right text-xs text-muted-foreground sm:text-sm">
           {notes.length}/100
         </p>
       </div>
+
+      {/* Spacer to clear fixed purchase card */}
+      <div className="h-0 sm:h-44" aria-hidden="true" />
 
       {/* Sticky purchase card */}
       <div className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-card/95 px-4 py-3 backdrop-blur-sm sm:px-6 sm:py-4">
@@ -100,7 +103,7 @@ export function MenuDetail({
                 <p className="text-[12px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
                   Total harga
                 </p>
-                <p className="font-display text-[20px] font-semibold text-foreground sm:text-[22px]">
+                <p className="font-display text-[17px] font-semibold text-foreground sm:text-[20px]">
                   {new Intl.NumberFormat("id-ID", {
                     style: "currency",
                     currency: "IDR",
@@ -121,7 +124,7 @@ export function MenuDetail({
                   <Minus className="h-3.5 w-3.5" aria-hidden="true" />
                 </button>
                 <span
-                  className="w-8 text-center text-[20px] font-semibold tabular-nums leading-none text-foreground sm:text-[22px]"
+                  className="w-8 text-center text-[17px] font-semibold tabular-nums leading-none text-foreground sm:text-[20px]"
                   aria-live="polite"
                   aria-atomic="true"
                 >
@@ -144,7 +147,7 @@ export function MenuDetail({
               type="button"
               onClick={handleAddToCart}
               disabled={!isActive || isPending}
-              className="mt-4 w-full rounded-[22px] px-5 py-3.5 text-[15px] font-semibold text-white transition-all duration-200 disabled:opacity-50 active:scale-[0.99] sm:mt-5 sm:rounded-[24px] sm:text-[16px]"
+              className="mt-4 w-full rounded-[22px] px-5 py-3.5 text-[13px] font-semibold text-white transition-all duration-200 disabled:opacity-50 active:scale-[0.99] sm:mt-5 sm:rounded-[24px] sm:text-[15px]"
               style={{ background: "var(--color-brand-teal)" }}
             >
               {isPending
