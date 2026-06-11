@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 export default function HomePage() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-pearl px-6 py-24">
-      <div className="mx-auto flex w-full max-w-2xl flex-col items-center gap-8 text-center">
+      <div className="mx-auto flex w-full max-w-2xl flex-col items-center gap-7 text-center">
         <span className="rounded-full bg-cream-paper px-4 py-1.5 text-sm font-medium text-midnight-ink">
           Kedai Cak Kum
         </span>

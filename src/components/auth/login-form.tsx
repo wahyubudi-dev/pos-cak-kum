@@ -55,7 +55,7 @@ export function LoginForm({ redirectTo, errorMessage }: LoginFormProps) {
   const displayedError = localError ?? errorMessage ?? null;
 
   return (
-    <div className="flex flex-col gap-6 rounded-3xl border border-border bg-card p-8 shadow-subtle">
+    <div className="flex flex-col gap-6 rounded-3xl border border-border bg-card p-7 shadow-subtle">
       <header className="flex flex-col gap-2 text-center">
         <h1 className="font-display text-3xl font-semibold tracking-tight text-foreground">
           Masuk ke Kedai Cak Kum

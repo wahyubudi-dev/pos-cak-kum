@@ -70,8 +70,8 @@ export function MenusManager({ menus, categories }: MenusManagerProps) {
               Tambah menu
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto p-5 sm:p-8 gap-5 sm:gap-8">
-            <DialogHeader className="pb-3 sm:pb-5">
+          <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto p-5 sm:p-7 gap-5 sm:gap-7">
+            <DialogHeader className="pb-0 pr-0">
               <DialogTitle>Tambah menu baru</DialogTitle>
             </DialogHeader>
             <MenuForm
@@ -83,7 +83,7 @@ export function MenusManager({ menus, categories }: MenusManagerProps) {
       </div>
 
       {hasNoCategories ? (
-        <div className="rounded-3xl border border-dashed border-border bg-card p-8 text-center text-sm text-muted-foreground">
+        <div className="rounded-3xl border border-dashed border-border bg-card p-7 text-center text-sm text-muted-foreground">
           Buat kategori dulu di{" "}
           <Link
             href="/admin/categories"
@@ -96,7 +96,7 @@ export function MenusManager({ menus, categories }: MenusManagerProps) {
       ) : null}
 
       {menus.length === 0 && !hasNoCategories ? (
-        <div className="rounded-3xl border border-dashed border-border bg-card p-8 text-center text-sm text-muted-foreground">
+        <div className="rounded-3xl border border-dashed border-border bg-card p-7 text-center text-sm text-muted-foreground">
           Belum ada menu. Klik &quot;Tambah menu&quot; untuk mulai.
         </div>
       ) : null}
@@ -210,7 +210,7 @@ function MenuRow({
                 Edit
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto p-5 sm:p-8">
+            <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto p-5 sm:p-7">
               <DialogHeader>
                 <DialogTitle>Edit menu</DialogTitle>
               </DialogHeader>

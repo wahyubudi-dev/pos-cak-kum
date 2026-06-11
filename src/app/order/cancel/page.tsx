@@ -17,7 +17,7 @@ export default async function OrderCancelPage({
   const cartHref = from && from.startsWith("/cart") ? from : "/cart";
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-background px-6 py-16">
+    <main className="flex min-h-screen flex-col items-center justify-center bg-background px-6 py-14">
       <div className="mx-auto flex w-full max-w-md flex-col items-center gap-6 rounded-3xl border border-border bg-card px-6 py-12 text-center">
         <div className="flex h-16 w-16 items-center justify-center rounded-full bg-muted">
           <span className="font-display text-2xl text-muted-foreground">×</span>

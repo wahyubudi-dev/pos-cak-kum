@@ -28,7 +28,7 @@ type CategoriesManagerProps = {
 
 export function CategoriesManager({ categories }: CategoriesManagerProps) {
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-7">
       <CreateCategoryForm />
       <CategoryList categories={categories} />
     </div>
@@ -90,7 +90,7 @@ function CreateCategoryForm() {
 function CategoryList({ categories }: { categories: Category[] }) {
   if (categories.length === 0) {
     return (
-      <div className="rounded-3xl border border-dashed border-border bg-card p-8 text-center text-sm text-muted-foreground">
+      <div className="rounded-3xl border border-dashed border-border bg-card p-7 text-center text-sm text-muted-foreground">
         Belum ada kategori. Tambahkan satu di atas.
       </div>
     );

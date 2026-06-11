@@ -19,7 +19,7 @@ export default async function LoginPage({
   const { redirectTo, error } = await searchParams;
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-pearl px-6 py-16">
+    <main className="flex min-h-screen flex-col items-center justify-center bg-pearl px-6 py-14">
       <div className="w-full max-w-sm">
         <Suspense>
           <LoginForm redirectTo={redirectTo} errorMessage={error} />

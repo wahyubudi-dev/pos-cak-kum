@@ -120,7 +120,7 @@ export default async function MenuDetailPage({
         </div>
 
         {/* Body */}
-        <div className="flex flex-col gap-5 pt-5 pb-6 sm:gap-6 sm:pt-6 sm:pb-8">
+        <div className="flex flex-col gap-5 pt-5 pb-6 sm:gap-6 sm:pt-6 sm:pb-7">
           <div className="flex flex-wrap items-center gap-2">
             {menu.category ? (
               <span className="inline-flex items-center rounded-full border border-border bg-card px-3 py-1 text-[12px] font-medium text-muted-foreground shadow-subtle">

@@ -285,6 +285,26 @@ export const orderItemsRelations = relations(orderItems, ({ one }) => ({
   menu: one(menus, { fields: [orderItems.menuId], references: [menus.id] }),
 }));
 
+/**
+ * Tables — master data for dine-in table labels (M01, VIP01, etc.).
+ * Admin manages these via /admin/tables.
+ */
+export const tables = pgTable(
+  "tables",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    label: text("label").notNull().unique(),
+    isActive: boolean("is_active").notNull().default(true),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [index("tables_active_idx").on(table.isActive)],
+);
+
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
 export type Category = typeof categories.$inferSelect;
@@ -305,3 +325,6 @@ export type BannerDisplay = (typeof bannerDisplayEnum.enumValues)[number];
 
 export type Banner = typeof banners.$inferSelect;
 export type NewBanner = typeof banners.$inferInsert;
+
+export type Table = typeof tables.$inferSelect;
+export type NewTable = typeof tables.$inferInsert;

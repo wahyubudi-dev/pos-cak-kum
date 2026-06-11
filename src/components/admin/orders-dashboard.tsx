@@ -209,7 +209,7 @@ function EmptyState({ filter }: { filter: StatusFilter }) {
       : `Belum ada pesanan dengan status "${ORDER_STATUS_LABELS[filter as OrderStatus]}".`;
 
   return (
-    <div className="flex flex-col items-center gap-2 rounded-3xl border border-dashed border-border bg-card px-6 py-16 text-center">
+    <div className="flex flex-col items-center gap-2 rounded-3xl border border-dashed border-border bg-card px-6 py-14 text-center">
       <p className="font-display text-lg font-semibold text-foreground">
         Tidak ada pesanan
       </p>

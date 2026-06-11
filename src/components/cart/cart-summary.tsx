@@ -8,28 +8,25 @@ type CartSummaryProps = {
   totalAmount: number;
   totalQuantity: number;
   hasInactiveItem: boolean;
-  /** When set, the checkout link forwards the table number through the URL. */
   tableNumber: string | null;
+  /** When set, render a button that calls this instead of a Link to /checkout */
+  onCheckout?: () => void;
 };
 
 /**
  * Sticky bottom bar with the running total, item count, and the Checkout CTA.
- *
- * Disabled state covers two cases:
- *   - Empty cart: nothing to check out.
- *   - At least one inactive item: customer must clear or update first
- *     (PRD CART-05).
  */
 export function CartSummary({
   totalAmount,
   totalQuantity,
   hasInactiveItem,
   tableNumber,
+  onCheckout,
 }: CartSummaryProps) {
   const isCheckoutDisabled = totalQuantity === 0 || hasInactiveItem;
   const checkoutHref = tableNumber
     ? `/checkout?table=${encodeURIComponent(tableNumber)}`
-    : "/checkout";
+    : "#";
 
   return (
     <div className="sticky bottom-4 z-20">
@@ -54,9 +51,21 @@ export function CartSummary({
             >
               Lanjutkan Checkout
             </Button>
+          ) : onCheckout ? (
+            <Button
+              type="button"
+              size="cta"
+              variant="primary"
+              onClick={onCheckout}
+              className="gap-2.5 px-5 shadow-subtle hover:-translate-y-0.5 active:translate-y-0 text-xs"
+            >
+              <ShoppingBag className="size-4" aria-hidden="true" />
+              Lanjutkan Checkout
+            </Button>
           ) : (
             <Button asChild size="cta" variant="primary" className="gap-2.5 px-5 shadow-subtle hover:-translate-y-0.5 active:translate-y-0">
               <Link href={checkoutHref} className="text-xs">
+                <ShoppingBag className="size-4" aria-hidden="true" />
                 Lanjutkan Checkout
               </Link>
             </Button>

@@ -7,6 +7,7 @@ const NAV_LINKS = [
   { href: "/admin/orders", label: "Pesanan" },
   { href: "/admin/menus", label: "Menu" },
   { href: "/admin/categories", label: "Kategori" },
+  { href: "/admin/tables", label: "Meja" },
   { href: "/admin/banners", label: "Banner" },
   { href: "/admin/users", label: "Pengguna" },
 ] as const;
@@ -21,8 +22,8 @@ const NAV_LINKS = [
 export function AdminNav() {
   return (
     <header className="sticky top-0 z-30 border-b border-border bg-card/85 backdrop-blur">
-      <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-6 py-7">
-        <div className="flex items-center gap-8">
+      <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-6 py-4">
+        <div className="flex items-center gap-7">
           <Link href="/admin" className="flex shrink-0 items-center gap-2">
             <span className="font-display text-base font-semibold tracking-tight">
               Cak Kum

@@ -51,8 +51,8 @@ export function BannersManager({ banners }: BannersManagerProps) {
               Tambah banner
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto sm:max-h-[90vh] p-5 sm:p-8 gap-5 sm:gap-8 top-[50%] sm:top-[50%]">
-            <DialogHeader className="pb-3 sm:pb-5">
+          <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto sm:max-h-[90vh] p-5 sm:p-7 gap-5 sm:gap-7 top-[50%] sm:top-[50%]">
+            <DialogHeader className="pb-0 pr-0">
               <DialogTitle>Tambah banner baru</DialogTitle>
             </DialogHeader>
             <BannerForm onSaved={() => setIsCreateOpen(false)} />
@@ -61,7 +61,7 @@ export function BannersManager({ banners }: BannersManagerProps) {
       </div>
 
       {banners.length === 0 ? (
-        <div className="rounded-3xl border border-dashed border-border bg-card p-8 text-center text-sm text-muted-foreground">
+        <div className="rounded-3xl border border-dashed border-border bg-card p-7 text-center text-sm text-muted-foreground">
           Belum ada banner. Klik &quot;Tambah banner&quot; untuk mulai.
         </div>
       ) : (
@@ -175,7 +175,7 @@ function BannerRow({ banner }: { banner: AdminBanner }) {
               Edit
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto p-5 sm:p-8 gap-5 sm:gap-8">
+          <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto p-5 sm:p-7 gap-5 sm:gap-7">
             <DialogHeader>
               <DialogTitle>Edit banner</DialogTitle>
             </DialogHeader>

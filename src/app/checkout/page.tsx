@@ -32,8 +32,8 @@ export default async function CheckoutPage({
   // can fix things. /checkout never shows an "empty" state of its own.
   if (cart.items.length === 0) {
     return (
-      <main className="min-h-screen bg-background px-5 py-16 sm:px-6">
-        <div className="mx-auto flex max-w-lg flex-col items-center gap-4 rounded-3xl border border-dashed border-border bg-card px-6 py-16 text-center">
+      <main className="min-h-screen bg-background px-5 py-14 sm:px-6">
+        <div className="mx-auto flex max-w-lg flex-col items-center gap-4 rounded-3xl border border-dashed border-border bg-card px-6 py-14 text-center">
           <p className="font-display text-[18px] font-semibold text-foreground sm:text-[22px]">
             Tidak ada pesanan
           </p>
@@ -55,8 +55,8 @@ export default async function CheckoutPage({
 
   if (cart.hasInactiveItem) {
     return (
-      <main className="min-h-screen bg-background px-5 py-16 sm:px-6">
-        <div className="mx-auto flex max-w-lg flex-col items-center gap-4 rounded-3xl border border-destructive/40 bg-card px-6 py-16 text-center">
+      <main className="min-h-screen bg-background px-5 py-14 sm:px-6">
+        <div className="mx-auto flex max-w-lg flex-col items-center gap-4 rounded-3xl border border-destructive/40 bg-card px-6 py-14 text-center">
           <p className="font-display text-[18px] font-semibold text-foreground sm:text-[22px]">
             Ada menu yang tidak tersedia
           </p>

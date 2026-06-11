@@ -19,7 +19,7 @@ export default async function OrderSuccessPage({
     : null;
 
   return (
-    <main className="relative flex min-h-screen flex-col items-center justify-center bg-background px-5 py-16 sm:px-6">
+    <main className="relative flex min-h-screen flex-col items-center justify-center bg-background px-5 py-14 sm:px-6">
       {/* subtle background decoration */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <div className="absolute -left-20 -top-20 h-60 w-60 rounded-full bg-brand-teal/5 blur-3xl" />

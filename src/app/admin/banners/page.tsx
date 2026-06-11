@@ -28,7 +28,7 @@ export default async function AdminBannersPage() {
       <p className="mt-1 text-sm text-muted-foreground">
         Kelola banner promosi yang tampil di halaman menu pelanggan.
       </p>
-      <div className="mt-8">
+      <div className="mt-7">
         <BannersManager banners={mapped} />
       </div>
     </main>
