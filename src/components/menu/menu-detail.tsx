@@ -1,0 +1,161 @@
+"use client";
+
+import { useRouter } from "next/navigation";
+import { useState, useTransition } from "react";
+import { toast } from "sonner";
+import { Minus, Plus } from "lucide-react";
+
+import { addToCart } from "@/lib/cart/actions";
+
+type MenuDetailProps = {
+  menuId: string;
+  menuName: string;
+  price: number;
+  isActive: boolean;
+  isAuthenticated: boolean;
+  returnPath: string;
+};
+
+/**
+ * Client component for the menu detail page.
+ * Handles quantity stepper, optional notes textarea, and add-to-cart action.
+ */
+export function MenuDetail({
+  menuId,
+  menuName,
+  price,
+  isActive,
+  isAuthenticated,
+  returnPath,
+}: MenuDetailProps) {
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
+  const [quantity, setQuantity] = useState(1);
+  const [notes, setNotes] = useState("");
+
+  const totalPrice = price * quantity;
+
+  function decrement() {
+    setQuantity((q) => Math.max(1, q - 1));
+  }
+
+  function increment() {
+    setQuantity((q) => Math.min(99, q + 1));
+  }
+
+  function handleAddToCart() {
+    if (!isAuthenticated) {
+      router.push(`/login?redirectTo=${encodeURIComponent(returnPath)}`);
+      return;
+    }
+
+    startTransition(async () => {
+      const formData = new FormData();
+      formData.set("menu_id", menuId);
+      formData.set("quantity", String(quantity));
+      if (notes.trim()) formData.set("notes", notes.trim());
+
+      const result = await addToCart(formData);
+      if (result.ok) {
+        toast.success(`${menuName} ditambahkan ke keranjang`);
+        router.back();
+      } else {
+        toast.error(result.message ?? "Gagal menambahkan ke keranjang");
+      }
+    });
+  }
+
+  return (
+    <>
+      {/* Notes textarea */}
+      <div className="flex flex-col gap-2">
+        <label
+          htmlFor="notes"
+          className="text-[15px] font-medium text-foreground sm:text-base"
+        >
+          Catatan <span className="font-normal text-muted-foreground">(opsional)</span>
+        </label>
+        <textarea
+          id="notes"
+          value={notes}
+          onChange={(e) => setNotes(e.target.value)}
+          maxLength={100}
+          rows={4}
+          placeholder="Contoh: tanpa bawang, level pedas sedang..."
+          disabled={!isActive || isPending}
+          className="min-h-32 w-full resize-none rounded-[24px] border border-border bg-card px-4 py-3.5 text-[15px] leading-6 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 disabled:opacity-50 sm:min-h-36 sm:px-5 sm:py-4 sm:text-base sm:leading-7"
+          style={{ focusRingColor: "var(--color-brand-teal)" } as React.CSSProperties}
+        />
+        <p className="text-right text-xs text-muted-foreground sm:text-sm">
+          {notes.length}/100
+        </p>
+      </div>
+
+      {/* Sticky purchase card */}
+      <div className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-card/95 px-4 py-3 backdrop-blur-sm sm:px-6 sm:py-4">
+        <div className="mx-auto max-w-lg">
+          <div className="rounded-[28px] border border-border bg-card p-4 shadow-subtle sm:p-5">
+            <div className="flex items-start justify-between gap-4">
+              <div className="space-y-1">
+                <p className="text-[12px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+                  Total harga
+                </p>
+                <p className="font-display text-[20px] font-semibold text-foreground sm:text-[22px]">
+                  {new Intl.NumberFormat("id-ID", {
+                    style: "currency",
+                    currency: "IDR",
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0,
+                  }).format(totalPrice)}
+                </p>
+              </div>
+
+              <div className="flex items-center gap-3 rounded-full border border-border bg-background px-3 py-2 sm:gap-4 sm:px-4">
+                <button
+                  type="button"
+                  onClick={decrement}
+                  disabled={quantity <= 1 || !isActive || isPending}
+                  aria-label="Kurangi jumlah"
+                  className="flex h-8 w-8 items-center justify-center rounded-full border border-border bg-card text-foreground transition-colors hover:bg-pearl disabled:opacity-40"
+                >
+                  <Minus className="h-3.5 w-3.5" aria-hidden="true" />
+                </button>
+                <span
+                  className="w-8 text-center text-[20px] font-semibold tabular-nums leading-none text-foreground sm:text-[22px]"
+                  aria-live="polite"
+                  aria-atomic="true"
+                >
+                  {quantity}
+                </span>
+                <button
+                  type="button"
+                  onClick={increment}
+                  disabled={quantity >= 99 || !isActive || isPending}
+                  aria-label="Tambah jumlah"
+                  className="flex h-8 w-8 items-center justify-center rounded-full border border-border text-white transition-colors disabled:opacity-40"
+                  style={{ background: "var(--color-brand-teal)" }}
+                >
+                  <Plus className="h-3.5 w-3.5" aria-hidden="true" />
+                </button>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={handleAddToCart}
+              disabled={!isActive || isPending}
+              className="mt-4 w-full rounded-[22px] px-5 py-3.5 text-[15px] font-semibold text-white transition-all duration-200 disabled:opacity-50 active:scale-[0.99] sm:mt-5 sm:rounded-[24px] sm:text-[16px]"
+              style={{ background: "var(--color-brand-teal)" }}
+            >
+              {isPending
+                ? "Menambahkan..."
+                : !isActive
+                  ? "Sedang tidak tersedia"
+                  : "Tambah ke keranjang"}
+            </button>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}
