@@ -81,9 +81,10 @@ export default async function CheckoutPage({
     .map((item) => ({
       id: item.id,
       name: item.menu!.name,
-      price: Number(item.menu!.price),
+      price: item.unitPrice ? Number(item.unitPrice) : Number(item.menu!.price),
       quantity: item.quantity,
       notes: item.notes,
+      size: item.size,
     }));
 
   return (

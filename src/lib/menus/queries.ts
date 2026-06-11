@@ -78,6 +78,7 @@ export async function getFeaturedMenus(
       imageUrl: menus.imageUrl,
       isActive: menus.isActive,
       isFeatured: menus.isFeatured,
+      menuSizes: menus.menuSizes,
       createdAt: menus.createdAt,
       updatedAt: menus.updatedAt,
       popularity: sql<number>`coalesce(sum(${orderItems.quantity}), 0)::int`,

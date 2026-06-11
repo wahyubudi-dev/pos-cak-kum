@@ -8,6 +8,20 @@
       "when": 1781209665437,
       "tag": "20260611202745_fresh_purple_man",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1781212005328,
+      "tag": "20260611210645_whole_echo",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1781212282841,
+      "tag": "20260611211122_charming_doorman",
+      "breakpoints": true
     }
   ]
 }

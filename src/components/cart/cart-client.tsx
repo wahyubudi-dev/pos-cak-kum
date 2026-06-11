@@ -9,7 +9,9 @@ import { TablePickerDialog } from "@/components/cart/table-picker-dialog";
 type ClientCartItem = {
   id: string;
   quantity: number;
+  unitPrice: string | null;
   notes: string | null;
+  size: string | null;
   menu: {
     id: string;
     name: string;

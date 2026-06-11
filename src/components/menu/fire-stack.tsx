@@ -21,7 +21,7 @@ export function FireStack({ isFeatured }: FireStackProps) {
           key={i}
           className="flex h-6 w-6 items-center justify-center rounded-full bg-white shadow-sm"
           style={{
-            marginLeft: i === 0 ? 0 : "-8px",
+            marginLeft: i === 0 ? 0 : "-7px",
             zIndex: 3 - i,
             position: "relative",
           }}

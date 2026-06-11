@@ -6,7 +6,7 @@ import { z } from "zod";
 
 import { requireAdmin } from "@/lib/auth/session";
 import { db } from "@/lib/db";
-import { menus } from "@/lib/db/schema";
+import { menus, type MenuSize } from "@/lib/db/schema";
 import { createClient } from "@/lib/supabase/server";
 
 const MAX_IMAGE_BYTES = 2 * 1024 * 1024;
@@ -31,6 +31,17 @@ const menuSchema = z.object({
     .union([z.literal("on"), z.literal("true"), z.literal("false"), z.boolean()])
     .optional()
     .transform((value) => value === "on" || value === "true" || value === true),
+  menu_sizes: z
+    .string()
+    .optional()
+    .transform((value) => {
+      if (!value) return [];
+      try {
+        return JSON.parse(value) as MenuSize[];
+      } catch {
+        return [];
+      }
+    }),
 });
 
 export type MenuActionState = {
@@ -51,6 +62,7 @@ function parseMenuForm(formData: FormData):
     price: formData.get("price") ?? 0,
     is_active: formData.get("is_active") ?? false,
     is_featured: formData.get("is_featured") ?? false,
+    menu_sizes: formData.get("menu_sizes") ?? "[]",
   });
 
   if (!parsed.success) {
@@ -141,6 +153,7 @@ export async function createMenu(
       imageUrl,
       isActive: parsed.value.is_active,
       isFeatured: parsed.value.is_featured,
+      menuSizes: parsed.value.menu_sizes,
     });
   } catch (error) {
     if (imageUrl) await deleteStoredImage(imageUrl);
@@ -195,6 +208,7 @@ export async function updateMenu(
         price: parsed.value.price.toString(),
         isActive: parsed.value.is_active,
         isFeatured: parsed.value.is_featured,
+        menuSizes: parsed.value.menu_sizes,
         ...(imageUrl !== undefined ? { imageUrl } : {}),
         updatedAt: new Date(),
       })

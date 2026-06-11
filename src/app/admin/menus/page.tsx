@@ -35,6 +35,7 @@ export default async function AdminMenusPage() {
           is_featured: m.isFeatured,
           category_id: m.categoryId,
           category_name: m.category?.name ?? null,
+          menu_sizes: (m.menuSizes ?? []) as { label: string; price: number }[],
         }))}
       />
     </main>

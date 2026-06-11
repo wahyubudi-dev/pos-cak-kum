@@ -24,6 +24,11 @@ const addToCartSchema = z.object({
     .max(100, "Catatan maksimal 100 karakter")
     .optional()
     .transform((value) => (value && value.length > 0 ? value : null)),
+  size: z
+    .string()
+    .trim()
+    .optional()
+    .transform((value) => (value && value.length > 0 ? value : null)),
 });
 
 const updateCartItemSchema = z.object({
@@ -59,6 +64,7 @@ export async function addToCart(formData: FormData): Promise<CartActionState> {
     menu_id: formData.get("menu_id"),
     quantity: formData.get("quantity") ?? 1,
     notes: formData.get("notes") ?? "",
+    size: formData.get("size") ?? "",
   });
 
   if (!parsed.success) {
@@ -69,27 +75,40 @@ export async function addToCart(formData: FormData): Promise<CartActionState> {
   }
 
   const menu = await db.query.menus.findFirst({
-    columns: { id: true, isActive: true },
+    columns: { id: true, isActive: true, price: true, menuSizes: true },
     where: eq(menus.id, parsed.data.menu_id),
   });
 
   if (!menu) return { ok: false, message: "Menu tidak ditemukan" };
   if (!menu.isActive) return { ok: false, message: "Menu sedang tidak tersedia" };
 
+  // Determine unit price: use size price if available, else menu price.
+  const selectedSize = parsed.data.size
+    ? (menu.menuSizes as { label: string; price: number }[] | null)?.find(
+        (s) => s.label === parsed.data.size,
+      )
+    : null;
+  const unitPrice = selectedSize ? selectedSize.price : Number(menu.price);
+
   const cartId = await getOrCreateCartId(user.auth.id);
 
-  // Match existing line by (cart, menu, notes). Postgres treats NULL as
-  // distinct in normal equality so we branch on whether notes is null.
+  // Match existing line by (cart, menu, size, notes).
   const notesCondition =
     parsed.data.notes === null
       ? isNull(cartItems.notes)
       : eq(cartItems.notes, parsed.data.notes);
+
+  const sizeCondition =
+    parsed.data.size === null
+      ? isNull(cartItems.size)
+      : eq(cartItems.size, parsed.data.size);
 
   const existing = await db.query.cartItems.findFirst({
     columns: { id: true, quantity: true },
     where: and(
       eq(cartItems.cartId, cartId),
       eq(cartItems.menuId, parsed.data.menu_id),
+      sizeCondition,
       notesCondition,
     ),
   });
@@ -106,7 +125,9 @@ export async function addToCart(formData: FormData): Promise<CartActionState> {
         cartId,
         menuId: parsed.data.menu_id,
         quantity: parsed.data.quantity,
+        unitPrice: unitPrice.toString(),
         notes: parsed.data.notes,
+        size: parsed.data.size,
       });
     }
   } catch (error) {

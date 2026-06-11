@@ -83,7 +83,8 @@ export async function createOrderFromCart(
   let totalAmount = 0;
   for (const item of cart.items) {
     if (!item.menu) continue;
-    totalAmount += Number(item.menu.price) * item.quantity;
+    const unitPrice = item.unitPrice ? Number(item.unitPrice) : Number(item.menu.price);
+    totalAmount += unitPrice * item.quantity;
   }
 
   let orderNumber: number;
@@ -108,8 +109,9 @@ export async function createOrderFromCart(
             menuId: item.menuId,
             quantity: item.quantity,
             // Snapshot the price; historical orders never re-price.
-            unitPrice: item.menu!.price,
+            unitPrice: item.unitPrice ?? item.menu!.price,
             notes: item.notes,
+            size: item.size,
           })),
       );
 

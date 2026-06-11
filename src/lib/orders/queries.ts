@@ -44,6 +44,7 @@ export async function getAllOrdersForAdmin(options?: {
           unitPrice: true,
           subtotal: true,
           notes: true,
+          size: true,
         },
         with: {
           menu: {
@@ -120,6 +121,7 @@ export async function getOrdersByUser(
           unitPrice: true,
           subtotal: true,
           notes: true,
+          size: true,
         },
         with: {
           menu: {
@@ -153,6 +155,7 @@ export async function getOrderByOrderNumber(
           unitPrice: true,
           subtotal: true,
           notes: true,
+          size: true,
         },
         with: {
           menu: {
@@ -185,6 +188,7 @@ export async function getOrderById(id: string): Promise<AdminOrder | null> {
           unitPrice: true,
           subtotal: true,
           notes: true,
+          size: true,
         },
         with: {
           menu: {

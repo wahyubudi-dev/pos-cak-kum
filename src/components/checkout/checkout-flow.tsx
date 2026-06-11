@@ -16,6 +16,7 @@ type CheckoutItem = {
   price: number;
   quantity: number;
   notes: string | null;
+  size: string | null;
 };
 
 type CheckoutFlowProps = {
@@ -136,6 +137,11 @@ function ReviewStep({
               <div className="flex flex-col gap-0.5 min-w-0">
                 <span className="text-[12px] font-medium text-foreground">
                   {item.name}
+                  {item.size ? (
+                    <span className="ml-1 inline-flex items-center rounded-full border border-border bg-pearl px-1.5 py-0.5 text-[8px] font-medium text-muted-foreground align-middle">
+                      {item.size}
+                    </span>
+                  ) : null}
                   <span className="text-muted-foreground"> × {item.quantity}</span>
                 </span>
                 {item.notes ? (

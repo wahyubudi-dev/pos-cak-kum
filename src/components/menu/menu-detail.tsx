@@ -7,23 +7,23 @@ import { Minus, Plus } from "lucide-react";
 
 import { addToCart } from "@/lib/cart/actions";
 
+type MenuSize = { label: string; price: number };
+
 type MenuDetailProps = {
   menuId: string;
   menuName: string;
   price: number;
+  menuSizes: MenuSize[] | null;
   isActive: boolean;
   isAuthenticated: boolean;
   returnPath: string;
 };
 
-/**
- * Client component for the menu detail page.
- * Handles quantity stepper, optional notes textarea, and add-to-cart action.
- */
 export function MenuDetail({
   menuId,
   menuName,
   price,
+  menuSizes,
   isActive,
   isAuthenticated,
   returnPath,
@@ -32,8 +32,12 @@ export function MenuDetail({
   const [isPending, startTransition] = useTransition();
   const [quantity, setQuantity] = useState(1);
   const [notes, setNotes] = useState("");
+  const [selectedSize, setSelectedSize] = useState<MenuSize | null>(
+    menuSizes && menuSizes.length > 0 ? menuSizes[0] : null,
+  );
 
-  const totalPrice = price * quantity;
+  const unitPrice = selectedSize ? selectedSize.price : price;
+  const totalPrice = unitPrice * quantity;
 
   function decrement() {
     setQuantity((q) => Math.max(1, q - 1));
@@ -54,6 +58,7 @@ export function MenuDetail({
       formData.set("menu_id", menuId);
       formData.set("quantity", String(quantity));
       if (notes.trim()) formData.set("notes", notes.trim());
+      if (selectedSize) formData.set("size", selectedSize.label);
 
       const result = await addToCart(formData);
       if (result.ok) {
@@ -67,6 +72,48 @@ export function MenuDetail({
 
   return (
     <>
+      {/* Size selector */}
+      {menuSizes && menuSizes.length > 0 ? (
+        <div className="flex flex-col gap-2">
+          <span className="text-[13px] font-medium text-foreground sm:text-[15px]">
+            Ukuran
+          </span>
+          <div className="flex flex-wrap gap-2">
+            {menuSizes.map((size) => {
+              const isSelected = selectedSize?.label === size.label;
+              return (
+                <button
+                  key={size.label}
+                  type="button"
+                  onClick={() => setSelectedSize(size)}
+                  disabled={!isActive || isPending}
+                  className={`inline-flex items-center gap-1.5 rounded-full border px-4 py-2 text-[12px] font-medium transition-all sm:text-[13px] ${
+                    isSelected
+                      ? "border-brand-teal bg-brand-teal/10 text-brand-teal shadow-sm"
+                      : "border-border bg-white text-muted-foreground hover:border-foreground/30 hover:text-foreground"
+                  }`}
+                  style={
+                    isSelected
+                      ? { borderColor: "var(--color-brand-teal)" }
+                      : undefined
+                  }
+                >
+                  {size.label}
+                  <span className="font-semibold">
+                    {new Intl.NumberFormat("id-ID", {
+                      style: "currency",
+                      currency: "IDR",
+                      minimumFractionDigits: 0,
+                      maximumFractionDigits: 0,
+                    }).format(size.price)}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      ) : null}
+
       {/* Notes textarea */}
       <div className="flex flex-col gap-2">
         <label
@@ -124,7 +171,7 @@ export function MenuDetail({
                   <Minus className="h-3.5 w-3.5" aria-hidden="true" />
                 </button>
                 <span
-                  className="w-8 text-center text-[17px] font-semibold tabular-nums leading-none text-foreground sm:text-[20px]"
+                  className="w-7 text-center text-[17px] font-semibold tabular-nums leading-none text-foreground sm:text-[20px]"
                   aria-live="polite"
                   aria-atomic="true"
                 >

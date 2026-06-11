@@ -25,6 +25,8 @@ type Category = {
   name: string;
 };
 
+type MenuSize = { label: string; price: number };
+
 type AdminMenu = {
   id: string;
   name: string;
@@ -35,6 +37,7 @@ type AdminMenu = {
   is_featured: boolean;
   category_id: string;
   category_name: string | null;
+  menu_sizes: MenuSize[];
 };
 
 type MenusManagerProps = {
@@ -225,6 +228,7 @@ function MenuRow({
                   category_id: menu.category_id,
                   is_active: menu.is_active,
                   is_featured: menu.is_featured,
+                  menu_sizes: menu.menu_sizes,
                 }}
                 onSaved={() => setIsEditOpen(false)}
               />

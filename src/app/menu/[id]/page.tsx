@@ -177,6 +177,7 @@ export default async function MenuDetailPage({
             menuId={menu.id}
             menuName={menu.name}
             price={Number(menu.price)}
+            menuSizes={menu.menuSizes as { label: string; price: number }[] | null}
             isActive={menu.isActive}
             isAuthenticated={Boolean(user)}
             returnPath={returnPath}

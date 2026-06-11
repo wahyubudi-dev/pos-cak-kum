@@ -73,7 +73,8 @@ export async function getCurrentUserCart(): Promise<CartWithItems> {
     }
     if (!item.menu.isActive) hasInactiveItem = true;
     if (item.menu.isActive) {
-      totalAmount += Number(item.menu.price) * item.quantity;
+      const unitPrice = item.unitPrice ? Number(item.unitPrice) : Number(item.menu.price);
+      totalAmount += unitPrice * item.quantity;
     }
   }
 

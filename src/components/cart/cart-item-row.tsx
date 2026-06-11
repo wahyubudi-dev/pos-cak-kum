@@ -17,7 +17,9 @@ import { cn } from "@/lib/utils";
 type CartItem = {
   id: string;
   quantity: number;
+  unitPrice: string | null;
   notes: string | null;
+  size: string | null;
   menu: {
     id: string;
     name: string;
@@ -48,7 +50,8 @@ export function CartItemRow({ item }: CartItemRowProps) {
 
   const menu = item.menu;
   const isInactive = !menu || !menu.is_active;
-  const subtotal = menu ? menu.price * quantity : 0;
+  const unitPrice = item.unitPrice ? Number(item.unitPrice) : (menu?.price ?? 0);
+  const subtotal = unitPrice * quantity;
 
   function persist(nextQuantity: number, nextNotes: string) {
     startTransition(async () => {
@@ -119,10 +122,15 @@ export function CartItemRow({ item }: CartItemRowProps) {
       <div className="flex flex-1 flex-col gap-2 min-w-0">
         <div className="flex items-start justify-between gap-3">
           <div className="flex flex-col gap-1 min-w-0">
-            <div className="flex flex-wrap items-center gap-2">
+            <div className="flex flex-wrap items-center gap-1.5">
               <span className="text-[12px] font-medium text-foreground">
                 {menu?.name ?? "Menu tidak tersedia"}
               </span>
+              {item.size ? (
+                <span className="inline-flex items-center rounded-full border border-border bg-pearl px-2 py-0.5 text-[9px] font-medium text-muted-foreground">
+                  {item.size}
+                </span>
+              ) : null}
               {isInactive ? (
                 <Badge
                   variant="outline"
@@ -134,7 +142,7 @@ export function CartItemRow({ item }: CartItemRowProps) {
             </div>
             {menu ? (
               <span className="text-xs text-muted-foreground">
-                {formatRupiah(menu.price)}
+                {formatRupiah(unitPrice)}
                 {quantity > 1 ? ` × ${quantity}` : ""}
               </span>
             ) : null}

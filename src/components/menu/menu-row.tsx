@@ -66,6 +66,18 @@ export function MenuRow({ menu, tableNumber, showFire = false }: MenuRowProps) {
         >
           {formatRupiah(Number(menu.price))}
         </p>
+        {menu.menuSizes && (menu.menuSizes as { label: string }[]).length > 0 ? (
+          <div className="mt-1 flex flex-wrap gap-1">
+            {(menu.menuSizes as { label: string }[]).map((s) => (
+              <span
+                key={s.label}
+                className="inline-flex items-center rounded-full border border-border bg-pearl/60 px-2 py-0.5 text-[8px] font-medium text-muted-foreground"
+              >
+                {s.label}
+              </span>
+            ))}
+          </div>
+        ) : null}
       </div>
     </Link>
   );

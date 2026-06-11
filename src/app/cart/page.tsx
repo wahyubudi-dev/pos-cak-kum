@@ -61,7 +61,9 @@ export default async function CartPage({
               items={cart.items.map((item) => ({
                 id: item.id,
                 quantity: item.quantity,
+                unitPrice: item.unitPrice,
                 notes: item.notes,
+                size: item.size,
                 menu: item.menu
                   ? {
                       id: item.menu.id,

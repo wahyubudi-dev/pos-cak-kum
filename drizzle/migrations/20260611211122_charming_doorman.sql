@@ -1,0 +1,1 @@
+ALTER TABLE "cart_items" ADD COLUMN "unit_price" numeric(12, 2);

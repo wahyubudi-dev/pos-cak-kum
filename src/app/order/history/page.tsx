@@ -57,7 +57,7 @@ export default async function OrderHistoryPage({
         {orders.length === 0 ? (
           <EmptyState tableNumber={tableNumber} />
         ) : (
-          <div className="mx-auto max-w-lg px-5 pt-2 pb-8 sm:px-6">
+          <div className="mx-auto max-w-lg px-5 pt-2 pb-7 sm:px-6">
             <div className="mb-6 grid grid-cols-2 gap-3">
               <div className="rounded-2xl border border-border bg-white px-4 py-3.5 shadow-sm">
                 <span className="flex items-center gap-1.5 text-[10px] font-medium uppercase tracking-[0.08em] text-muted-foreground">
@@ -242,6 +242,11 @@ function OrderCard({
               <div className="flex flex-col gap-0.5 min-w-0">
                 <span className="text-[12px] font-medium text-foreground truncate">
                   {item.menu?.name ?? "Unknown"}
+                  {item.size ? (
+                    <span className="ml-1 inline-flex items-center rounded-full border border-border bg-pearl px-1.5 py-0.5 text-[7px] font-medium text-muted-foreground align-middle">
+                      {item.size}
+                    </span>
+                  ) : null}
                 </span>
                 <span className="text-[10px] text-muted-foreground">
                   {item.quantity}× Rp{Number(item.unitPrice).toLocaleString("id-ID")}

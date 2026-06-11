@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useActionState, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
+import { Plus, Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -29,6 +30,8 @@ type Category = {
   name: string;
 };
 
+type MenuSize = { label: string; price: number };
+
 type MenuDefaults = {
   id?: string;
   category_id?: string;
@@ -38,6 +41,7 @@ type MenuDefaults = {
   image_url?: string | null;
   is_active?: boolean;
   is_featured?: boolean;
+  menu_sizes?: MenuSize[];
 };
 
 type MenuFormProps = {
@@ -55,6 +59,24 @@ export function MenuForm({ categories, defaults, onSaved }: MenuFormProps) {
     defaults?.image_url ?? null,
   );
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const [sizes, setSizes] = useState<MenuSize[]>(defaults?.menu_sizes ?? []);
+
+  function addSize() {
+    setSizes((prev) => [...prev, { label: "", price: 0 }]);
+  }
+
+  function updateSize(index: number, field: keyof MenuSize, value: string | number) {
+    setSizes((prev) => {
+      const next = [...prev];
+      next[index] = { ...next[index], [field]: value };
+      return next;
+    });
+  }
+
+  function removeSize(index: number) {
+    setSizes((prev) => prev.filter((_, i) => i !== index));
+  }
 
   // Handle action result in useEffect to avoid setState-during-render
   useEffect(() => {
@@ -185,6 +207,66 @@ export function MenuForm({ categories, defaults, onSaved }: MenuFormProps) {
           placeholder="Ceritakan singkat porsi atau bahan utama (opsional)"
         />
       </FormField>
+
+      {/* Ukuran */}
+      <div className="flex flex-col gap-3 rounded-2xl border border-border bg-pearl/50 px-4 py-3.5 sm:px-5 sm:py-4">
+        <div className="flex items-center justify-between">
+          <Label className="text-sm font-medium">Ukuran</Label>
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            onClick={addSize}
+            className="rounded-xl text-xs gap-1"
+          >
+            <Plus className="h-3 w-3" />
+            Tambah ukuran
+          </Button>
+        </div>
+        {sizes.length === 0 ? (
+          <p className="text-xs text-muted-foreground">
+            Menu ini tidak punya variasi ukuran. Pelanggan akan melihat harga
+            tunggal.
+          </p>
+        ) : (
+          <div className="flex flex-col gap-2">
+            {sizes.map((size, index) => (
+              <div
+                key={index}
+                className="flex items-center gap-2 rounded-xl border border-border bg-white px-3 py-2"
+              >
+                <Input
+                  type="text"
+                  value={size.label}
+                  onChange={(e) => updateSize(index, "label", e.target.value)}
+                  placeholder="Misal: Reguler"
+                  className="h-7 min-w-0 flex-1 rounded-lg border-border text-xs px-2.5"
+                />
+                <div className="flex items-center gap-1 shrink-0">
+                  <span className="text-[10px] text-muted-foreground">Rp</span>
+                  <Input
+                    type="number"
+                    min={0}
+                    step={500}
+                    value={size.price}
+                    onChange={(e) => updateSize(index, "price", Number(e.target.value))}
+                    className="h-7 w-20 rounded-lg border-border text-xs px-2"
+                  />
+                </div>
+                <button
+                  type="button"
+                  onClick={() => removeSize(index)}
+                  className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+                  aria-label="Hapus ukuran"
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+        <input type="hidden" name="menu_sizes" value={JSON.stringify(sizes)} />
+      </div>
 
       <div className="flex flex-col gap-3">
         <Label>Gambar menu</Label>

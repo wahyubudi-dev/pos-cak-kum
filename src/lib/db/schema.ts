@@ -3,6 +3,7 @@ import {
   boolean,
   index,
   integer,
+  json,
   numeric,
   pgEnum,
   pgTable,
@@ -62,6 +63,11 @@ export const categories = pgTable(
   (table) => [index("categories_sort_order_idx").on(table.sortOrder)],
 );
 
+export type MenuSize = {
+  label: string;
+  price: number;
+};
+
 export const menus = pgTable(
   "menus",
   {
@@ -75,6 +81,7 @@ export const menus = pgTable(
     imageUrl: text("image_url"),
     isActive: boolean("is_active").notNull().default(true),
     isFeatured: boolean("is_featured").notNull().default(false),
+    menuSizes: json("menu_sizes").$type<MenuSize[]>().default([]).notNull(),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
@@ -114,7 +121,9 @@ export const cartItems = pgTable(
       .notNull()
       .references(() => menus.id, { onDelete: "restrict" }),
     quantity: integer("quantity").notNull(),
+    unitPrice: numeric("unit_price", { precision: 12, scale: 2 }),
     notes: text("notes"),
+    size: text("size"),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
@@ -124,7 +133,7 @@ export const cartItems = pgTable(
   },
   (table) => [
     index("cart_items_cart_idx").on(table.cartId),
-    unique().on(table.cartId, table.menuId, table.notes),
+    unique().on(table.cartId, table.menuId, table.size, table.notes),
   ],
 );
 
@@ -189,6 +198,7 @@ export const orderItems = pgTable(
       .notNull()
       .default(sql`0`),
     notes: text("notes"),
+    size: text("size"),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
