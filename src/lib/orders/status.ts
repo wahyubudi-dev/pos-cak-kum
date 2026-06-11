@@ -7,7 +7,7 @@ import type { OrderStatus } from "@/lib/db/schema";
 export const ORDER_STATUS_LABELS: Record<OrderStatus, string> = {
   pending_confirmation: "Menunggu konfirmasi",
   processing: "Sedang diproses",
-  ready: "Siap diambil",
+  ready: "Sedang diantar",
   completed: "Selesai",
   cancelled: "Dibatalkan",
 };

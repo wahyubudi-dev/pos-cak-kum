@@ -42,7 +42,7 @@ export default async function AdminDashboardPage() {
         <StatCard
           label="Pesanan aktif"
           value={String(activeCount)}
-          hint="Menunggu, diproses, atau siap diambil"
+          hint="Menunggu, diproses, atau sedang diantar"
           accent="bg-cream-paper"
         />
         <StatCard
