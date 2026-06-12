@@ -1,7 +1,19 @@
-import { and, count, desc, eq, gte, inArray, lt, sql } from "drizzle-orm";
+import type { SQL } from "drizzle-orm";
+import {
+  and,
+  count,
+  desc,
+  eq,
+  gte,
+  ilike,
+  inArray,
+  lt,
+  or,
+  sql,
+} from "drizzle-orm";
 
 import { db } from "@/lib/db";
-import { orders } from "@/lib/db/schema";
+import { orders, users } from "@/lib/db/schema";
 import { ACTIVE_ORDER_STATUSES } from "@/lib/orders/status";
 import type {
   Menu,
@@ -26,13 +38,58 @@ export type AdminOrder = Order & {
 export async function getAllOrdersForAdmin(options?: {
   status?: OrderStatus | "all";
   limit?: number;
+  offset?: number;
+  search?: string;
+  startDate?: Date;
+  endDate?: Date;
 }): Promise<AdminOrder[]> {
-  const status = options?.status;
+  const { status, limit, offset, search, startDate, endDate } = options ?? {};
+
+  const filters: (SQL | undefined)[] = [];
+
+  if (status && status !== "all") {
+    filters.push(eq(orders.status, status));
+  }
+
+  if (startDate) {
+    filters.push(gte(orders.createdAt, startDate));
+  }
+
+  if (endDate) {
+    filters.push(lt(orders.createdAt, endDate));
+  }
+
+  if (search) {
+    const orderNum = parseInt(search);
+    const searchFilters: (SQL | undefined)[] = [];
+
+    if (!isNaN(orderNum)) {
+      searchFilters.push(eq(orders.orderNumber, orderNum));
+    }
+
+    const userRows = await db
+      .select({ id: users.id })
+      .from(users)
+      .where(ilike(users.fullName, `%${search}%`));
+
+    if (userRows.length > 0) {
+      searchFilters.push(
+        inArray(orders.userId, userRows.map((u) => u.id)),
+      );
+    }
+
+    if (searchFilters.length > 0) {
+      filters.push(or(...searchFilters));
+    } else {
+      filters.push(sql`1=0`);
+    }
+  }
 
   const rows = await db.query.orders.findMany({
-    where: status && status !== "all" ? eq(orders.status, status) : undefined,
+    where: and(...filters) || undefined,
     orderBy: [desc(orders.createdAt)],
-    limit: options?.limit,
+    limit: limit ?? 20,
+    offset,
     with: {
       customer: {
         columns: { id: true, fullName: true, email: true },
@@ -56,6 +113,62 @@ export async function getAllOrdersForAdmin(options?: {
   });
 
   return rows;
+}
+
+export async function countAllOrdersForAdmin(options?: {
+  status?: OrderStatus | "all";
+  search?: string;
+  startDate?: Date;
+  endDate?: Date;
+}): Promise<number> {
+  const { status, search, startDate, endDate } = options ?? {};
+
+  const filters: (SQL | undefined)[] = [];
+
+  if (status && status !== "all") {
+    filters.push(eq(orders.status, status));
+  }
+
+  if (startDate) {
+    filters.push(gte(orders.createdAt, startDate));
+  }
+
+  if (endDate) {
+    filters.push(lt(orders.createdAt, endDate));
+  }
+
+  if (search) {
+    const orderNum = parseInt(search);
+    const searchFilters: (SQL | undefined)[] = [];
+
+    if (!isNaN(orderNum)) {
+      searchFilters.push(eq(orders.orderNumber, orderNum));
+    }
+
+    const userRows = await db
+      .select({ id: users.id })
+      .from(users)
+      .where(ilike(users.fullName, `%${search}%`));
+
+    if (userRows.length > 0) {
+      searchFilters.push(
+        inArray(orders.userId, userRows.map((u) => u.id)),
+      );
+    }
+
+    if (searchFilters.length > 0) {
+      filters.push(or(...searchFilters));
+    } else {
+      filters.push(sql`1=0`);
+    }
+  }
+
+  const [row] = await db
+    .select({ value: count() })
+    .from(orders)
+    .where(and(...filters) || undefined);
+
+  return row?.value ?? 0;
 }
 
 export async function getActiveOrdersCount(): Promise<number> {
@@ -123,7 +236,7 @@ export async function getDailyRevenue(
 
   const rows = await db
     .select({
-      day: sql<string>`DATE(${orders.createdAt})`,
+      day: sql<string>`DATE(${orders.createdAt} AT TIME ZONE 'Asia/Jakarta')`,
       orderCount: count(),
       totalAmount: sql<string>`coalesce(sum(${orders.totalAmount}), 0)`,
     })
@@ -135,8 +248,8 @@ export async function getDailyRevenue(
         sql`${orders.status} <> 'cancelled'`,
       ),
     )
-    .groupBy(sql`DATE(${orders.createdAt})`)
-    .orderBy(sql`DATE(${orders.createdAt})`);
+    .groupBy(sql`DATE(${orders.createdAt} AT TIME ZONE 'Asia/Jakarta')`)
+    .orderBy(sql`DATE(${orders.createdAt} AT TIME ZONE 'Asia/Jakarta')`);
 
   return rows.map((r) => ({
     day: r.day,

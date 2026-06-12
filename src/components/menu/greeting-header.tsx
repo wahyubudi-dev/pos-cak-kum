@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Clock, Search } from "lucide-react";
+import { Clock, LogOut } from "lucide-react";
 
 type GreetingHeaderProps = {
   tableNumber: string | null;
@@ -28,37 +28,17 @@ export function GreetingHeader({
             className="font-display text-sm font-semibold leading-tight text-foreground"
             style={{ letterSpacing: "-0.03em" }}
           >
-            Hallo, {greeting}
+            {userName
+              ? `Halo ${userName.split(" ")[0]}, ${greeting}`
+              : `Halo, ${greeting}`}
           </h1>
-          {userName ? (
-            <p className="text-[11px] text-muted-foreground leading-snug">
-              Mau pesen apa nih!
-              {/* Halo, {userName.split(" ")[0]} 👋, Mau pesen apa nih! */}
-            </p>
-          ) : (
-            <p className="text-[10px] text-muted-foreground leading-snug">
-              Mau pesen apa nih!
-            </p>
-          )}
+          <p className="text-[11px] text-muted-foreground leading-snug">
+            Mau pesen apa nih!
+          </p>
         </div>
 
-        {/* Right: search + table badge */}
+        {/* Right: history + logout */}
         <div className="flex shrink-0 items-center gap-2">
-          {tableNumber ? (
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-white px-3 py-1 text-xs font-semibold text-foreground shadow-sm">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 16 16"
-                fill="currentColor"
-                className="h-3 w-3"
-                style={{ color: "var(--color-brand-teal)" }}
-                aria-hidden="true"
-              >
-                <path d="M2 3.5A1.5 1.5 0 0 1 3.5 2h9A1.5 1.5 0 0 1 14 3.5v1A1.5 1.5 0 0 1 12.5 6H9v1h1.5a.75.75 0 0 1 0 1.5H9V14H7V8.5H5.5a.75.75 0 0 1 0-1.5H7V6H3.5A1.5 1.5 0 0 1 2 4.5v-1Z" />
-              </svg>
-              Meja {tableNumber}
-            </span>
-          ) : null}
 
           <Link
             href={
@@ -71,13 +51,15 @@ export function GreetingHeader({
           >
             <Clock className="h-4 w-4" aria-hidden="true" />
           </Link>
-          <Link
-            href={`${returnPath}#menu-search`}
-            aria-label="Cari menu"
-            className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-white text-muted-foreground shadow-sm transition-colors hover:bg-pearl hover:text-foreground"
-          >
-            <Search className="h-4 w-4" aria-hidden="true" />
-          </Link>
+          <form action="/auth/signout" method="post">
+            <button
+              type="submit"
+              aria-label="Keluar"
+              className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-white text-muted-foreground shadow-sm transition-colors hover:bg-red-50 hover:text-red-500"
+            >
+              <LogOut className="h-4 w-4" aria-hidden="true" />
+            </button>
+          </form>
         </div>
       </div>
     </header>

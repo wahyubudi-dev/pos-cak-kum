@@ -60,7 +60,7 @@ export function TablesManager({ tables }: TablesManagerProps) {
           Belum ada meja. Klik &quot;Tambah meja&quot; untuk mulai.
         </div>
       ) : (
-        <ul className="flex flex-col gap-3">
+        <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {tables.map((table) => (
             <li key={table.id}>
               <TableRow table={table} />
@@ -160,31 +160,23 @@ function TableRow({ table }: { table: AdminTable }) {
   }
 
   return (
-    <div className="flex items-center gap-4 rounded-2xl border border-border bg-card p-4">
-      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-cream-paper font-display text-sm font-semibold tabular-nums text-foreground">
-        {table.label}
-      </div>
-
-      <div className="flex flex-1 flex-col min-w-0">
-        <span className="font-medium text-foreground">{table.label}</span>
-      </div>
-
-      <div className="flex items-center gap-3">
-        <div className="flex items-center gap-2">
-          <Switch
-            checked={isActive}
-            onCheckedChange={handleToggle}
-            disabled={isToggling}
-            aria-label={isActive ? "Nonaktifkan meja" : "Aktifkan meja"}
-          />
-          <span className="text-xs text-muted-foreground">
-            {isActive ? "Aktif" : "Non-aktif"}
-          </span>
+    <div className="flex flex-col gap-3 rounded-2xl border border-border bg-card p-4">
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-cream-paper font-display text-sm font-semibold tabular-nums text-foreground">
+          {table.label}
         </div>
+        <Switch
+          checked={isActive}
+          onCheckedChange={handleToggle}
+          disabled={isToggling}
+          aria-label={isActive ? "Nonaktifkan meja" : "Aktifkan meja"}
+        />
+      </div>
 
+      <div className="flex items-center gap-2">
         <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
           <DialogTrigger asChild>
-            <Button type="button" variant="ghost" size="sm" className="rounded-lg">
+            <Button type="button" variant="ghost" size="sm" className="rounded-lg flex-1">
               Edit
             </Button>
           </DialogTrigger>
@@ -205,7 +197,7 @@ function TableRow({ table }: { table: AdminTable }) {
               type="button"
               variant="ghost"
               size="sm"
-              className="rounded-lg text-destructive hover:bg-destructive/10 hover:text-destructive"
+              className="rounded-lg flex-1 text-destructive hover:bg-destructive/10 hover:text-destructive"
               disabled={isDeleting}
             >
               {isDeleting ? "..." : "Hapus"}

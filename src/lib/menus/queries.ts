@@ -28,17 +28,26 @@ export async function getCategories(): Promise<Category[]> {
  * UI never renders an empty section.
  */
 export async function getActiveMenusByCategory(): Promise<CategoryWithMenus[]> {
-  const cats = await db.query.categories.findMany({
-    orderBy: [asc(categories.sortOrder), asc(categories.name)],
-    with: {
-      menus: {
-        where: eq(menus.isActive, true),
-        orderBy: [asc(menus.name)],
-      },
-    },
-  });
+  const rows = await db
+    .select({
+      category: categories,
+      menu: menus,
+    })
+    .from(categories)
+    .leftJoin(menus, eq(menus.categoryId, categories.id))
+    .where(eq(menus.isActive, true))
+    .orderBy(asc(categories.sortOrder), asc(categories.name), asc(menus.name));
 
-  return cats.filter((category) => category.menus.length > 0);
+  const grouped = new Map<string, CategoryWithMenus>();
+  for (const row of rows) {
+    if (!row.menu) continue;
+    if (!grouped.has(row.category.id)) {
+      grouped.set(row.category.id, { ...row.category, menus: [] });
+    }
+    grouped.get(row.category.id)!.menus.push(row.menu);
+  }
+
+  return [...grouped.values()];
 }
 
 /**

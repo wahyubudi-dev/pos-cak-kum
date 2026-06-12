@@ -1,6 +1,9 @@
 import { OrdersDashboard, type OrderView } from "@/components/admin/orders-dashboard";
 import { Button } from "@/components/ui/button";
-import { getAllOrdersForAdmin } from "@/lib/orders/queries";
+import {
+  countAllOrdersForAdmin,
+  getAllOrdersForAdmin,
+} from "@/lib/orders/queries";
 
 export const metadata = {
   title: "Pesanan · Admin Cak Kum",
@@ -11,27 +14,54 @@ function todayString(): string {
   return d.toISOString().slice(0, 10);
 }
 
-type SearchParams = Promise<{ startDate?: string; endDate?: string }>;
+type SearchParams = Promise<{
+  startDate?: string;
+  endDate?: string;
+  page?: string;
+  limit?: string;
+  search?: string;
+}>;
 
-export default async function AdminOrdersPage(props: { searchParams: SearchParams }) {
-  const { startDate: startParam, endDate: endParam } = await props.searchParams;
+export default async function AdminOrdersPage(props: {
+  searchParams: SearchParams;
+}) {
+  const {
+    startDate: startParam,
+    endDate: endParam,
+    page: pageParam,
+    limit: limitParam,
+    search: searchParam,
+  } = await props.searchParams;
 
   const startDate = startParam ?? todayString();
   const endDate = endParam ?? todayString();
+  const page = Math.max(1, Number(pageParam) || 1);
+  const limit = Math.min(100, Math.max(1, Number(limitParam) || 10));
+  const search = searchParam?.trim() ?? "";
 
   const start = new Date(startDate + "T00:00:00");
   const end = new Date(endDate + "T00:00:00");
   const endOfDay = new Date(end);
   endOfDay.setDate(endOfDay.getDate() + 1);
 
-  const orders = await getAllOrdersForAdmin();
-
-  const filteredOrders = orders.filter((order) => {
-    const createdAt = new Date(order.createdAt);
-    return createdAt >= start && createdAt < endOfDay;
+  const totalCount = await countAllOrdersForAdmin({
+    search: search || undefined,
+    startDate: start,
+    endDate: endOfDay,
   });
 
-  const initialOrders: OrderView[] = filteredOrders.map((order) => ({
+  const totalPages = Math.ceil(totalCount / limit);
+  const currentPage = Math.min(page, Math.max(totalPages, 1));
+
+  const orders = await getAllOrdersForAdmin({
+    limit,
+    offset: (currentPage - 1) * limit,
+    search: search || undefined,
+    startDate: start,
+    endDate: endOfDay,
+  });
+
+  const initialOrders: OrderView[] = orders.map((order) => ({
     id: order.id,
     orderNumber: order.orderNumber,
     status: order.status,
@@ -91,7 +121,14 @@ export default async function AdminOrdersPage(props: { searchParams: SearchParam
         </form>
       </header>
 
-      <OrdersDashboard initialOrders={initialOrders} />
+      <OrdersDashboard
+        initialOrders={initialOrders}
+        currentPage={currentPage}
+        totalPages={totalPages}
+        totalCount={totalCount}
+        search={search}
+        limit={limit}
+      />
     </div>
   );
 }

@@ -1,7 +1,8 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 
 import { AdminOrderRow } from "@/components/admin/order-row";
@@ -14,6 +15,7 @@ import { fetchAdminOrderView } from "@/lib/orders/dashboard-actions";
 import type { OrderView } from "@/lib/orders/views";
 import { createClient } from "@/lib/supabase/client";
 import type { OrderStatus } from "@/lib/db/schema";
+import { Input } from "@/components/ui/input";
 
 export type { OrderView } from "@/lib/orders/views";
 
@@ -21,6 +23,11 @@ type StatusFilter = OrderStatus | "all";
 
 type OrdersDashboardProps = {
   initialOrders: OrderView[];
+  currentPage: number;
+  totalPages: number;
+  totalCount: number;
+  search: string;
+  limit: number;
 };
 
 const FILTER_OPTIONS: { value: StatusFilter; label: string }[] = [
@@ -31,27 +38,25 @@ const FILTER_OPTIONS: { value: StatusFilter; label: string }[] = [
   })),
 ];
 
-/**
- * Live admin orders dashboard.
- *
- * Server hands us a fully-hydrated initial page, then we subscribe to the
- * orders table so new orders, status updates, and cancellations show up
- * without a manual refresh.
- *
- * Realtime payload carries only the orders row, so we either:
- *   1. INSERT: call a Server Action (Drizzle-backed) to fetch the order
- *      with joins and prepend.
- *   2. UPDATE: patch the mutable fields (status, total) in place — no
- *      re-fetch needed because items + customer are immutable post-create.
- *
- * Direct DB queries from the browser are intentionally avoided. supabase-js
- * is used only for the Realtime subscription transport, not for data fetch.
- */
-export function OrdersDashboard({ initialOrders }: OrdersDashboardProps) {
+export function OrdersDashboard({
+  initialOrders,
+  currentPage,
+  totalPages,
+  totalCount,
+  search,
+  limit,
+}: OrdersDashboardProps) {
   const [orders, setOrders] = useState<OrderView[]>(initialOrders);
   const [filter, setFilter] = useState<StatusFilter>("all");
+  const [searchValue, setSearchValue] = useState(search);
+  const router = useRouter();
+  const searchTimeout = useRef<ReturnType<typeof setTimeout>>(null);
 
   const supabase = useMemo(() => createClient(), []);
+
+  useEffect(() => {
+    setOrders(initialOrders);
+  }, [initialOrders]);
 
   const fetchOrderById = useCallback(
     async (id: string): Promise<OrderView | null> => {
@@ -125,8 +130,67 @@ export function OrdersDashboard({ initialOrders }: OrdersDashboardProps) {
     return orders.filter((order) => order.status === filter);
   }, [orders, filter]);
 
+  function goToPage(page: number) {
+    const params = new URLSearchParams(window.location.search);
+    params.set("page", String(page));
+    router.push(`/admin/orders?${params.toString()}`);
+  }
+
+  function handleSearch(value: string) {
+    setSearchValue(value);
+    if (searchTimeout.current) clearTimeout(searchTimeout.current);
+    searchTimeout.current = setTimeout(() => {
+      const params = new URLSearchParams(window.location.search);
+      if (value.trim()) {
+        params.set("search", value.trim());
+      } else {
+        params.delete("search");
+      }
+      params.set("page", "1");
+      router.push(`/admin/orders?${params.toString()}`);
+    }, 400);
+  }
+
+  function handleLimitChange(newLimit: number) {
+    const params = new URLSearchParams(window.location.search);
+    params.set("limit", String(newLimit));
+    params.set("page", "1");
+    router.push(`/admin/orders?${params.toString()}`);
+  }
+
+  const from = totalCount === 0 ? 0 : (currentPage - 1) * limit + 1;
+  const to = Math.min(currentPage * limit, totalCount);
+
   return (
     <div className="flex flex-col gap-6">
+      <div className="flex flex-wrap items-center gap-3">
+        <Input
+          type="text"
+          placeholder="Cari nomor order atau nama pelanggan…"
+          value={searchValue}
+          onChange={(e) => handleSearch(e.target.value)}
+          className="h-9 max-w-xs rounded-lg text-sm"
+        />
+        <span className="text-xs text-muted-foreground">
+          {totalCount > 0
+            ? `${from}–${to} dari ${totalCount} pesanan`
+            : "Tidak ada pesanan"}
+        </span>
+        <div className="ml-auto flex items-center gap-2">
+          <label className="text-xs text-muted-foreground">Tampilkan</label>
+          <select
+            value={limit}
+            onChange={(e) => handleLimitChange(Number(e.target.value))}
+            className="h-7 rounded-lg border border-border bg-white px-2 text-xs shadow-sm"
+          >
+            <option value={10}>10</option>
+            <option value={20}>20</option>
+            <option value={50}>50</option>
+            <option value={100}>100</option>
+          </select>
+        </div>
+      </div>
+
       <FilterTabs value={filter} onChange={setFilter} orders={orders} />
 
       {filteredOrders.length === 0 ? (
@@ -149,6 +213,58 @@ export function OrdersDashboard({ initialOrders }: OrdersDashboardProps) {
           ))}
         </ul>
       )}
+
+      {totalPages > 0 ? (
+        <div className="flex items-center justify-center gap-2">
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            disabled={currentPage <= 1}
+            onClick={() => goToPage(currentPage - 1)}
+            className="rounded-lg"
+          >
+            Sebelumnya
+          </Button>
+          {Array.from({ length: totalPages }, (_, i) => i + 1)
+            .filter(
+              (p) =>
+                p === 1 ||
+                p === totalPages ||
+                Math.abs(p - currentPage) <= 2,
+            )
+            .map((p, idx, arr) => (
+              <span key={p} className="flex items-center">
+                {idx > 0 && arr[idx - 1] !== p - 1 ? (
+                  <span className="px-1 text-xs text-muted-foreground">…</span>
+                ) : null}
+                <Button
+                  type="button"
+                  variant={p === currentPage ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => goToPage(p)}
+                  className={
+                    p === currentPage
+                      ? "min-w-9 rounded-lg bg-foreground text-background"
+                      : "min-w-9 rounded-lg"
+                  }
+                >
+                  {p}
+                </Button>
+              </span>
+            ))}
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            disabled={currentPage >= totalPages}
+            onClick={() => goToPage(currentPage + 1)}
+            className="rounded-lg"
+          >
+            Selanjutnya
+          </Button>
+        </div>
+      ) : null}
     </div>
   );
 }
