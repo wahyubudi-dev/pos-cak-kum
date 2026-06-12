@@ -18,7 +18,7 @@ export const ORDER_STATUS_LABELS: Record<OrderStatus, string> = {
 export const ORDER_STATUS_TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
   pending_confirmation: ["processing", "cancelled"],
   processing: ["ready", "cancelled"],
-  ready: ["completed", "cancelled"],
+  ready: ["completed"],
   completed: [],
   cancelled: [],
 };

@@ -87,7 +87,7 @@ export function MenuDetail({
                   type="button"
                   onClick={() => setSelectedSize(size)}
                   disabled={!isActive || isPending}
-                  className={`inline-flex items-center gap-1.5 rounded-full border px-4 py-2 text-[12px] font-medium transition-all sm:text-[13px] ${
+                  className={`inline-flex items-center gap-1.5 rounded-full border px-4 py-2 text-[12px] transition-all ${
                     isSelected
                       ? "border-brand-teal bg-brand-teal/10 text-brand-teal shadow-sm"
                       : "border-border bg-white text-muted-foreground hover:border-foreground/30 hover:text-foreground"
@@ -99,7 +99,7 @@ export function MenuDetail({
                   }
                 >
                   {size.label}
-                  <span className="font-semibold">
+                  <span>
                     {new Intl.NumberFormat("id-ID", {
                       style: "currency",
                       currency: "IDR",

@@ -53,7 +53,7 @@ export function TablePickerDialog({ tables, open, onOpenChange }: TablePickerDia
               Pilih meja
             </DialogTitle>
             <DialogDescription className="text-[11px] text-muted-foreground">
-              Pilih nomor meja untuk melanjutkan ke checkout.
+              Pilih nomor meja kamu dulu untuk melanjutkan ke proses checkout.
             </DialogDescription>
           </div>
         </div>

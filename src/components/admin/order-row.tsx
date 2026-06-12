@@ -36,6 +36,7 @@ type AdminOrderRowProps = {
   createdAt: string;
   customer: Customer | null;
   items: OrderItem[];
+  onStatusChange?: (newStatus: OrderStatus) => void;
 };
 
 const TIME_FORMAT = new Intl.DateTimeFormat("id-ID", {
@@ -58,6 +59,7 @@ export function AdminOrderRow({
   createdAt,
   customer,
   items,
+  onStatusChange,
 }: AdminOrderRowProps) {
   const [isPending, startTransition] = useTransition();
   const [isExpanded, setIsExpanded] = useState(false);
@@ -69,8 +71,12 @@ export function AdminOrderRow({
   function handleTransition(next: OrderStatus) {
     startTransition(async () => {
       const result = await updateOrderStatus(id, next);
-      if (result.ok) toast.success(result.message ?? "Status diperbarui");
-      else toast.error(result.message ?? "Gagal mengubah status");
+      if (result.ok) {
+        onStatusChange?.(next);
+        toast.success(result.message ?? "Status diperbarui");
+      } else {
+        toast.error(result.message ?? "Gagal mengubah status");
+      }
     });
   }
 

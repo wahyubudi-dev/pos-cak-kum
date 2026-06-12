@@ -1,18 +1,37 @@
 import { OrdersDashboard, type OrderView } from "@/components/admin/orders-dashboard";
+import { Button } from "@/components/ui/button";
 import { getAllOrdersForAdmin } from "@/lib/orders/queries";
 
 export const metadata = {
   title: "Pesanan · Admin Cak Kum",
 };
 
-/**
- * Admin orders page. Renders the initial snapshot server-side, then hands
- * control to the live OrdersDashboard which subscribes to Realtime updates.
- */
-export default async function AdminOrdersPage() {
+function todayString(): string {
+  const d = new Date();
+  return d.toISOString().slice(0, 10);
+}
+
+type SearchParams = Promise<{ startDate?: string; endDate?: string }>;
+
+export default async function AdminOrdersPage(props: { searchParams: SearchParams }) {
+  const { startDate: startParam, endDate: endParam } = await props.searchParams;
+
+  const startDate = startParam ?? todayString();
+  const endDate = endParam ?? todayString();
+
+  const start = new Date(startDate + "T00:00:00");
+  const end = new Date(endDate + "T00:00:00");
+  const endOfDay = new Date(end);
+  endOfDay.setDate(endOfDay.getDate() + 1);
+
   const orders = await getAllOrdersForAdmin();
 
-  const initialOrders: OrderView[] = orders.map((order) => ({
+  const filteredOrders = orders.filter((order) => {
+    const createdAt = new Date(order.createdAt);
+    return createdAt >= start && createdAt < endOfDay;
+  });
+
+  const initialOrders: OrderView[] = filteredOrders.map((order) => ({
     id: order.id,
     orderNumber: order.orderNumber,
     status: order.status,
@@ -36,18 +55,43 @@ export default async function AdminOrdersPage() {
   }));
 
   return (
-    <main className="mx-auto flex max-w-5xl flex-col gap-7 px-6 py-12">
-      <header className="flex flex-col gap-1">
-        <h1 className="font-display text-3xl font-semibold tracking-tight">
-          Pesanan
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          Pantau pesanan masuk secara real-time. Verifikasi pembayaran lalu
-          ubah status menjadi diproses, siap, atau selesai.
-        </p>
+    <div className="flex flex-col gap-7 py-12">
+      <header className="flex flex-wrap items-end justify-between gap-3">
+        <div className="flex flex-col gap-1">
+          <h1 className="font-display text-3xl font-semibold tracking-tight">
+            Pesanan
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            Pantau pesanan masuk secara real-time. Verifikasi pembayaran lalu
+            proses pesanan pelanggan.
+          </p>
+        </div>
+        <form className="flex items-center gap-2">
+          <input
+            type="date"
+            name="startDate"
+            defaultValue={startDate}
+            className="h-7 rounded-lg border border-border bg-white px-2.5 text-xs shadow-sm"
+          />
+          <span className="text-xs text-muted-foreground">—</span>
+          <input
+            type="date"
+            name="endDate"
+            defaultValue={endDate}
+            className="h-7 rounded-lg border border-border bg-white px-2.5 text-xs shadow-sm"
+          />
+          <Button
+            type="submit"
+            size="sm"
+            variant="default"
+            className="rounded-lg text-xs"
+          >
+            Terapkan
+          </Button>
+        </form>
       </header>
 
       <OrdersDashboard initialOrders={initialOrders} />
-    </main>
+    </div>
   );
 }

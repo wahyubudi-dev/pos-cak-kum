@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { DashboardCharts } from "@/components/admin/dashboard-charts";
 import { OrderStatusBadge } from "@/components/admin/order-status-badge";
 import { Button } from "@/components/ui/button";
 import { requireAdmin } from "@/lib/auth/session";
@@ -7,6 +8,8 @@ import { formatRupiah } from "@/lib/format";
 import {
   getActiveOrdersCount,
   getAllOrdersForAdmin,
+  getDailyRevenue,
+  getOrderStatusDistribution,
   getTodayStats,
 } from "@/lib/orders/queries";
 
@@ -19,16 +22,34 @@ const TIME_FORMAT = new Intl.DateTimeFormat("id-ID", {
   minute: "2-digit",
 });
 
-export default async function AdminDashboardPage() {
-  const [admin, activeCount, todayStats, recentOrders] = await Promise.all([
-    requireAdmin(),
-    getActiveOrdersCount(),
-    getTodayStats(),
-    getAllOrdersForAdmin({ limit: 5 }),
-  ]);
+function todayString(): string {
+  const d = new Date();
+  return d.toISOString().slice(0, 10);
+}
+
+type SearchParams = Promise<{ startDate?: string; endDate?: string }>;
+
+export default async function AdminDashboardPage(props: { searchParams: SearchParams }) {
+  const { startDate: startParam, endDate: endParam } = await props.searchParams;
+
+  const startDate = startParam ?? todayString();
+  const endDate = endParam ?? todayString();
+
+  const start = new Date(startDate + "T00:00:00");
+  const end = new Date(endDate + "T00:00:00");
+
+  const [admin, activeCount, todayStats, recentOrders, chartData, statusData] =
+    await Promise.all([
+      requireAdmin(),
+      getActiveOrdersCount(),
+      getTodayStats(),
+      getAllOrdersForAdmin({ limit: 5 }),
+      getDailyRevenue(start, end),
+      getOrderStatusDistribution(start, end),
+    ]);
 
   return (
-    <main className="mx-auto flex max-w-5xl flex-col gap-3 px-6 py-12">
+    <div className="flex flex-col gap-3 py-12">
       <header className="flex flex-col gap-2">
         <h1 className="font-display text-3xl font-semibold tracking-tight">
           Halo, {admin.fullName?.split(" ")[0] ?? "Cak"}
@@ -56,6 +77,36 @@ export default async function AdminDashboardPage() {
           hint="Belum termasuk pesanan dibatalkan"
           accent="bg-mint-wash"
         />
+      </section>
+
+      <section className="flex flex-col gap-4 rounded-3xl border border-border bg-card p-6">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h2 className="font-display text-lg font-semibold">Grafik</h2>
+          <form className="flex items-center gap-2">
+            <input
+              type="date"
+              name="startDate"
+              defaultValue={startDate}
+              className="h-7 rounded-lg border border-border bg-white px-2.5 text-xs shadow-sm"
+            />
+            <span className="text-xs text-muted-foreground">—</span>
+            <input
+              type="date"
+              name="endDate"
+              defaultValue={endDate}
+              className="h-7 rounded-lg border border-border bg-white px-2.5 text-xs shadow-sm"
+            />
+            <Button
+              type="submit"
+              size="sm"
+              variant="default"
+              className="rounded-lg text-xs"
+            >
+              Terapkan
+            </Button>
+          </form>
+        </div>
+        <DashboardCharts barData={chartData} pieData={statusData} />
       </section>
 
       <section className="flex flex-col gap-4 rounded-3xl border border-border bg-card p-6">
@@ -128,7 +179,7 @@ export default async function AdminDashboardPage() {
           description="Atur kategori dan urutannya supaya mudah ditemukan pelanggan."
         />
       </section>
-    </main>
+    </div>
   );
 }
 

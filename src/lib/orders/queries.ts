@@ -1,4 +1,4 @@
-import { and, count, desc, eq, gte, inArray, sql } from "drizzle-orm";
+import { and, count, desc, eq, gte, inArray, lt, sql } from "drizzle-orm";
 
 import { db } from "@/lib/db";
 import { orders } from "@/lib/db/schema";
@@ -78,17 +78,28 @@ export async function getTodayStats(): Promise<{
   const startOfToday = new Date();
   startOfToday.setHours(0, 0, 0, 0);
 
-  const [row] = await db
+  const rows = await db
     .select({
       total: count(),
-      revenue: sql<string>`coalesce(sum(case when ${orders.status} <> 'cancelled' then ${orders.totalAmount} else 0 end), 0)`,
     })
     .from(orders)
     .where(gte(orders.createdAt, startOfToday));
 
+  const revenueRows = await db
+    .select({
+      value: sql<string>`coalesce(sum(${orders.totalAmount}), 0)`,
+    })
+    .from(orders)
+    .where(
+      and(
+        gte(orders.createdAt, startOfToday),
+        sql`${orders.status} <> 'cancelled'`,
+      ),
+    );
+
   return {
-    count: row?.total ?? 0,
-    revenue: Number(row?.revenue ?? 0),
+    count: rows[0]?.total ?? 0,
+    revenue: Number(revenueRows[0]?.value ?? 0),
   };
 }
 
@@ -96,6 +107,75 @@ export async function getTodayStats(): Promise<{
  * Fetch orders for the current customer by user ID. Includes item snapshots
  * with menu names. Ordered newest-first.
  */
+export type DailyRevenue = {
+  day: string;
+  orderCount: number;
+  revenue: number;
+};
+
+export async function getDailyRevenue(
+  startDate: Date,
+  endDate: Date,
+): Promise<DailyRevenue[]> {
+  const endOfDay = new Date(endDate);
+  endOfDay.setDate(endOfDay.getDate() + 1);
+  endOfDay.setHours(0, 0, 0, 0);
+
+  const rows = await db
+    .select({
+      day: sql<string>`DATE(${orders.createdAt})`,
+      orderCount: count(),
+      totalAmount: sql<string>`coalesce(sum(${orders.totalAmount}), 0)`,
+    })
+    .from(orders)
+    .where(
+      and(
+        gte(orders.createdAt, startDate),
+        lt(orders.createdAt, endOfDay),
+        sql`${orders.status} <> 'cancelled'`,
+      ),
+    )
+    .groupBy(sql`DATE(${orders.createdAt})`)
+    .orderBy(sql`DATE(${orders.createdAt})`);
+
+  return rows.map((r) => ({
+    day: r.day,
+    orderCount: r.orderCount,
+    revenue: Number(r.totalAmount),
+  }));
+}
+
+export type StatusDistribution = {
+  status: string;
+  count: number;
+};
+
+export async function getOrderStatusDistribution(
+  startDate: Date,
+  endDate: Date,
+): Promise<StatusDistribution[]> {
+  const endOfDay = new Date(endDate);
+  endOfDay.setDate(endOfDay.getDate() + 1);
+  endOfDay.setHours(0, 0, 0, 0);
+
+  const rows = await db
+    .select({
+      status: orders.status,
+      count: count(),
+    })
+    .from(orders)
+    .where(
+      and(
+        gte(orders.createdAt, startDate),
+        lt(orders.createdAt, endOfDay),
+      ),
+    )
+    .groupBy(orders.status)
+    .orderBy(orders.status);
+
+  return rows;
+}
+
 export async function getOrdersByUser(
   userId: string,
   options?: {

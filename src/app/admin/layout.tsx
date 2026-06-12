@@ -1,16 +1,8 @@
 import type { ReactNode } from "react";
 
-import { AdminNav } from "@/components/admin/admin-nav";
+import { AdminSidebar } from "@/components/admin/admin-sidebar";
 import { requireAdmin } from "@/lib/auth/session";
 
-/**
- * Admin-only layout guard.
- *
- * Wraps every /admin/* route. Server-side check runs on each request, so a
- * customer who manually types /admin/orders gets bounced before any admin
- * markup is even sent down the wire. Pairs with the RLS policies in
- * 0002_rls.sql — defense in depth, never trust either layer alone.
- */
 export default async function AdminLayout({
   children,
 }: {
@@ -20,8 +12,8 @@ export default async function AdminLayout({
 
   return (
     <div className="min-h-screen bg-pearl">
-      <AdminNav />
-      {children}
+      <AdminSidebar />
+      <div className="mx-auto max-w-5xl px-6 pb-20 min-[1440px]:pb-0">{children}</div>
     </div>
   );
 }

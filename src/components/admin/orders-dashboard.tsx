@@ -135,7 +135,16 @@ export function OrdersDashboard({ initialOrders }: OrdersDashboardProps) {
         <ul className="flex flex-col gap-3">
           {filteredOrders.map((order) => (
             <li key={order.id}>
-              <AdminOrderRow {...order} />
+              <AdminOrderRow
+                {...order}
+                onStatusChange={(newStatus) =>
+                  setOrders((prev) =>
+                    prev.map((o) =>
+                      o.id === order.id ? { ...o, status: newStatus } : o,
+                    ),
+                  )
+                }
+              />
             </li>
           ))}
         </ul>

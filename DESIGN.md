@@ -63,18 +63,18 @@ LottieFiles is a warm, light-mode design system that treats motion as the produc
 
 ### Spacing Scale
 
-| Name | Value | Token |
-|------|-------|-------|
-| 8 | 8px | `--spacing-8` |
-| 16 | 16px | `--spacing-16` |
-| 24 | 24px | `--spacing-24` |
-| 32 | 32px | `--spacing-32` |
-| 40 | 40px | `--spacing-40` |
-| 48 | 48px | `--spacing-48` |
-| 64 | 64px | `--spacing-64` |
-| 80 | 80px | `--spacing-80` |
-| 96 | 96px | `--spacing-96` |
-| 160 | 160px | `--spacing-160` |
+| Name | Value | Token           |
+| ------| -------| -----------------|
+| 8    | 8px   | `--spacing-8`   |
+| 16   | 16px  | `--spacing-16`  |
+| 24   | 24px  | `--spacing-24`  |
+| 32   | 32px  | `--spacing-32`  |
+| 40   | 40px  | `--spacing-40`  |
+| 48   | 48px  | `--spacing-48`  |
+| 64   | 64px  | `--spacing-64`  |
+| 80   | 80px  | `--spacing-80`  |
+| 96   | 96px  | `--spacing-96`  |
+| 160  | 160px | `--spacing-160` |
 
 ### Border Radius
 

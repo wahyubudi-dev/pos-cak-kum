@@ -21,16 +21,17 @@ export default async function AdminBannersPage() {
   }));
 
   return (
-    <main className="mx-auto max-w-5xl px-6 py-10">
+    <div className="py-10">
       <h1 className="font-display text-3xl font-semibold tracking-tight">
         Banner Carousel
       </h1>
       <p className="mt-1 text-sm text-muted-foreground">
         Kelola banner promosi yang tampil di halaman menu pelanggan.
       </p>
+
       <div className="mt-7">
         <BannersManager banners={mapped} />
       </div>
-    </main>
+    </div>
   );
 }

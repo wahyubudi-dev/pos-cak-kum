@@ -168,7 +168,7 @@ function ReviewStep({
             <div className="flex items-center justify-between">
               <span className="text-[11px] text-muted-foreground">Nomor Meja</span>
               <span className="text-[11px] font-medium text-muted-foreground tabular-nums">
-                Meja {tableNumber}
+                {tableNumber}
               </span>
             </div>
           ) : null}
