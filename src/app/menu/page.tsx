@@ -49,6 +49,7 @@ export default async function MenuPage({
         tableNumber={tableNumber}
         returnPath={returnPath}
         userName={user?.fullName ?? null}
+        isLoggedIn={!!user}
       />
 
       {/* 2. Hero banner carousel */}

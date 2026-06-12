@@ -176,7 +176,7 @@ function TableRow({ table }: { table: AdminTable }) {
       <div className="flex items-center gap-2">
         <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
           <DialogTrigger asChild>
-            <Button type="button" variant="ghost" size="sm" className="rounded-lg flex-1">
+            <Button type="button" variant="ghost" size="sm" className="rounded-lg flex-1 border border-border bg-cream-paper">
               Edit
             </Button>
           </DialogTrigger>
@@ -197,7 +197,7 @@ function TableRow({ table }: { table: AdminTable }) {
               type="button"
               variant="ghost"
               size="sm"
-              className="rounded-lg flex-1 text-destructive hover:bg-destructive/10 hover:text-destructive"
+              className="rounded-lg flex-1 border border-destructive/30 bg-destructive/5 text-destructive hover:bg-destructive/10 hover:text-destructive"
               disabled={isDeleting}
             >
               {isDeleting ? "..." : "Hapus"}

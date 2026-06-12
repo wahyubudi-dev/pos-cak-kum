@@ -55,12 +55,28 @@ export function LoginForm({ redirectTo, errorMessage }: LoginFormProps) {
   const displayedError = localError ?? errorMessage ?? null;
 
   return (
-    <div className="flex flex-col gap-6 rounded-3xl border border-border bg-card p-7 shadow-subtle">
+    <div className="flex flex-col gap-6 rounded-3xl border border-mist bg-white p-7 shadow-subtle">
       <header className="flex flex-col gap-2 text-center">
-        <h1 className="font-display text-3xl font-semibold tracking-tight text-foreground">
+        <span
+          className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl"
+          style={{ background: "var(--color-brand-teal)" }}
+        >
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="white"
+            strokeWidth={1.5}
+            className="h-6 w-6"
+          >
+            <path d="M12 2L2 7l10 5 10-5-10-5z" />
+            <path d="M2 17l10 5 10-5" />
+            <path d="M2 12l10 5 10-5" />
+          </svg>
+        </span>
+        <h1 className="mt-4 font-display text-2xl font-semibold tracking-tight text-midnight-ink">
           Masuk ke Kedai Cak Kum
         </h1>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-sm text-zinc-500-x">
           Pakai akun Google kamu untuk pesan dan simpan pesanan favorit.
         </p>
       </header>
@@ -69,10 +85,10 @@ export function LoginForm({ redirectTo, errorMessage }: LoginFormProps) {
         type="button"
         onClick={signInWithGoogle}
         disabled={isPending}
-        className="w-full"
+        className="w-full rounded-2xl"
         size="cta"
-            variant="primary"
-          >
+        variant="primary"
+      >
         {isPending ? "Mengarahkan ke Google..." : "Lanjutkan dengan Google"}
       </Button>
 
@@ -85,7 +101,7 @@ export function LoginForm({ redirectTo, errorMessage }: LoginFormProps) {
         </p>
       ) : null}
 
-      <p className="text-center text-xs text-muted-foreground">
+      <p className="text-center text-xs text-zinc-500-x leading-relaxed">
         Dengan masuk, kamu setuju agar pesanan dan profil dasar disimpan untuk
         kebutuhan pemesanan.
       </p>

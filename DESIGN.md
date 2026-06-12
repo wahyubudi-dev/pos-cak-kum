@@ -7,22 +7,22 @@ LottieFiles is a warm, light-mode design system that treats motion as the produc
 
 ## Tokens — Colors
 
-| Name | Value | Token | Role |
-|------|-------|-------|------|
-| Brand Teal | `#019d91` | `--color-brand-teal` | Teal supporting accent for decorative details and low-frequency emphasis. Do not promote it to the primary CTA color |
-| Mint Glow | `#61f7cf` | `--color-mint-glow` | Decorative illustration accent, gradient highlights behind hero characters, animated UI flourishes |
-| Mint Wash | `#b7ffe7` | `--color-mint-wash` | Teal supporting accent for decorative details and low-frequency emphasis. |
-| Cream Paper | `#fff8e5` | `--color-cream-paper` | Warm accent surface for announcement banners, highlight cards, and editorial callouts — breaks the cool grayscale rhythm |
-| Leaf Soft | `#94d19f` | `--color-leaf-soft` | Green supporting accent for decorative details and low-frequency emphasis |
-| Midnight Ink | `#09090b` | `--color-midnight-ink` | Primary body and heading text, logo wordmark, icon strokes — near-black with a barely-warm tint |
-| Zinc 900 | `#18181b` | `--color-zinc-900` | Supporting neutral for secondary UI, dividers, and muted labels. Do not promote it to the primary CTA color |
-| Zinc 600 | `#27272a` | `--color-zinc-600` | Secondary dark surface, hover states on dark elements, strong borders |
-| Zinc 500 | `#71717b` | `--color-zinc-500` | Secondary body text, icon fills, muted captions, inactive nav labels |
-| Fog Gray | `#9f9fa9` | `--color-fog-gray` | Tertiary text, placeholder copy, disabled labels, lowest-emphasis helper text |
-| Mist | `#e4e4e7` | `--color-mist` | Hairline borders, dividers, card outlines, input borders, section separators — the structural line of the system |
-| Pearl | `#f4f4f5` | `--color-pearl` | Page canvas, hero backgrounds, band backgrounds, hover surfaces |
-| Snow | `#fafafa` | `--color-snow` | Elevated card surfaces, subtle alternating rows, near-white backgrounds for content blocks |
-| White | `#ffffff` | `--color-white` | Card surfaces, modal backgrounds, input fills, nav bar background — the top of the surface stack |
+| Name         | Value     | Token                  | Role                                                                                                                     |
+| --------------| -----------| ------------------------| --------------------------------------------------------------------------------------------------------------------------|
+| Brand Teal   | `#019d91` | `--color-brand-teal`   | Teal supporting accent for decorative details and low-frequency emphasis. Do not promote it to the primary CTA color     |
+| Mint Glow    | `#61f7cf` | `--color-mint-glow`    | Decorative illustration accent, gradient highlights behind hero characters, animated UI flourishes                       |
+| Mint Wash    | `#b7ffe7` | `--color-mint-wash`    | Teal supporting accent for decorative details and low-frequency emphasis.                                                |
+| Cream Paper  | `#fff8e5` | `--color-cream-paper`  | Warm accent surface for announcement banners, highlight cards, and editorial callouts — breaks the cool grayscale rhythm |
+| Leaf Soft    | `#94d19f` | `--color-leaf-soft`    | Green supporting accent for decorative details and low-frequency emphasis                                                |
+| Midnight Ink | `#09090b` | `--color-midnight-ink` | Primary body and heading text, logo wordmark, icon strokes — near-black with a barely-warm tint                          |
+| Zinc 900     | `#18181b` | `--color-zinc-900`     | Supporting neutral for secondary UI, dividers, and muted labels. Do not promote it to the primary CTA color              |
+| Zinc 600     | `#27272a` | `--color-zinc-600`     | Secondary dark surface, hover states on dark elements, strong borders                                                    |
+| Zinc 500     | `#71717b` | `--color-zinc-500`     | Secondary body text, icon fills, muted captions, inactive nav labels                                                     |
+| Fog Gray     | `#9f9fa9` | `--color-fog-gray`     | Tertiary text, placeholder copy, disabled labels, lowest-emphasis helper text                                            |
+| Mist         | `#e4e4e7` | `--color-mist`         | Hairline borders, dividers, card outlines, input borders, section separators — the structural line of the system         |
+| Pearl        | `#f4f4f5` | `--color-pearl`        | Page canvas, hero backgrounds, band backgrounds, hover surfaces                                                          |
+| Snow         | `#fafafa` | `--color-snow`         | Elevated card surfaces, subtle alternating rows, near-white backgrounds for content blocks                               |
+| White        | `#ffffff` | `--color-white`        | Card surfaces, modal backgrounds, input fills, nav bar background — the top of the surface stack                         |
 
 ## Tokens — Typography
 

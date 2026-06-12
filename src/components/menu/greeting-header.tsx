@@ -1,10 +1,11 @@
 import Link from "next/link";
-import { Clock, LogOut } from "lucide-react";
+import { Clock, LogOut, LogIn } from "lucide-react";
 
 type GreetingHeaderProps = {
   tableNumber: string | null;
   returnPath: string;
   userName?: string | null;
+  isLoggedIn: boolean;
 };
 
 /**
@@ -16,6 +17,7 @@ export function GreetingHeader({
   tableNumber,
   returnPath,
   userName,
+  isLoggedIn,
 }: GreetingHeaderProps) {
   const greeting = getGreeting();
 
@@ -37,29 +39,41 @@ export function GreetingHeader({
           </p>
         </div>
 
-        {/* Right: history + logout */}
+        {/* Right: history + login / logout */}
         <div className="flex shrink-0 items-center gap-2">
 
-          <Link
-            href={
-              tableNumber
-                ? `/order/history?table=${encodeURIComponent(tableNumber)}`
-                : "/order/history"
-            }
-            aria-label="Riwayat pesanan"
-            className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-white text-muted-foreground shadow-sm transition-colors hover:bg-pearl hover:text-foreground"
-          >
-            <Clock className="h-4 w-4" aria-hidden="true" />
-          </Link>
-          <form action="/auth/signout" method="post">
-            <button
-              type="submit"
-              aria-label="Keluar"
-              className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-white text-muted-foreground shadow-sm transition-colors hover:bg-red-50 hover:text-red-500"
+          {isLoggedIn ? (
+            <Link
+              href={
+                tableNumber
+                  ? `/order/history?table=${encodeURIComponent(tableNumber)}`
+                  : "/order/history"
+              }
+              aria-label="Riwayat pesanan"
+              className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-white text-muted-foreground shadow-sm transition-colors hover:bg-pearl hover:text-foreground"
             >
-              <LogOut className="h-4 w-4" aria-hidden="true" />
-            </button>
-          </form>
+              <Clock className="h-4 w-4" aria-hidden="true" />
+            </Link>
+          ) : null}
+          {isLoggedIn ? (
+            <form action="/auth/signout" method="post">
+              <button
+                type="submit"
+                aria-label="Keluar"
+                className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-white text-muted-foreground shadow-sm transition-colors hover:bg-red-50 hover:text-red-500"
+              >
+                <LogOut className="h-4 w-4" aria-hidden="true" />
+              </button>
+            </form>
+          ) : (
+            <Link
+              href="/login"
+              aria-label="Masuk"
+              className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-white text-muted-foreground shadow-sm transition-colors hover:bg-brand-teal/5 hover:text-brand-teal"
+            >
+              <LogIn className="h-4 w-4" aria-hidden="true" />
+            </Link>
+          )}
         </div>
       </div>
     </header>

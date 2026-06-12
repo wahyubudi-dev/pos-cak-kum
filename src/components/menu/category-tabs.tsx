@@ -55,7 +55,7 @@ export function CategoryTabs({
                   "rounded-full px-4 py-1.5 text-[10px] font-medium transition-all duration-200",
                   isActive
                     ? "text-white"
-                    : "bg-card text-muted-foreground hover:bg-pearl hover:text-foreground",
+                    : "border border-border bg-card text-muted-foreground hover:bg-pearl hover:text-foreground",
                 )}
                 style={
                   isActive

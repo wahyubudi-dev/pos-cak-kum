@@ -82,19 +82,19 @@ export default async function AdminDashboardPage(props: { searchParams: SearchPa
       <section className="flex flex-col gap-4 rounded-3xl border border-border bg-card p-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 className="font-display text-lg font-semibold">Grafik</h2>
-          <form className="flex items-center gap-2">
+          <form className="flex flex-wrap items-center gap-2">
             <input
               type="date"
               name="startDate"
               defaultValue={startDate}
-              className="h-7 rounded-lg border border-border bg-white px-2.5 text-xs shadow-sm"
+              className="h-7 rounded-lg border border-border bg-white px-2 text-xs shadow-sm max-w-[140px] sm:max-w-none"
             />
-            <span className="text-xs text-muted-foreground">—</span>
+            <span className="hidden sm:inline text-xs text-muted-foreground">—</span>
             <input
               type="date"
               name="endDate"
               defaultValue={endDate}
-              className="h-7 rounded-lg border border-border bg-white px-2.5 text-xs shadow-sm"
+              className="h-7 rounded-lg border border-border bg-white px-2 text-xs shadow-sm max-w-[140px] sm:max-w-none"
             />
             <Button
               type="submit"

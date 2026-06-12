@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 
 import { createClient } from "@/lib/supabase/server";
+import { db } from "@/lib/db";
+import { users } from "@/lib/db/schema";
+import { eq } from "drizzle-orm";
 
 /**
  * OAuth callback handler.
@@ -28,6 +31,22 @@ export async function GET(request: Request) {
     return NextResponse.redirect(
       new URL(`/login?error=${encodeURIComponent(error.message)}`, url),
     );
+  }
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (user) {
+    const row = await db
+      .select({ role: users.role })
+      .from(users)
+      .where(eq(users.id, user.id))
+      .limit(1);
+
+    if (row.length > 0 && row[0].role === "admin") {
+      return NextResponse.redirect(new URL("/admin", url));
+    }
   }
 
   return NextResponse.redirect(new URL(next, url));
