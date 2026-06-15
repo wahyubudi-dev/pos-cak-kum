@@ -4,6 +4,10 @@ import { Check, Clock, ChefHat, BellRing, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { getOrderByOrderNumber } from "@/lib/orders/queries";
+import { getInvoice } from "@/lib/payments/xendit";
+import { db } from "@/lib/db";
+import { orders } from "@/lib/db/schema";
+import { eq } from "drizzle-orm";
 import { ORDER_STATUS_LABELS } from "@/lib/orders/status";
 import type { OrderStatus } from "@/lib/db/schema";
 
@@ -28,8 +32,29 @@ export default async function OrderSuccessPage({
   const order = await getOrderByOrderNumber(orderNumber);
   if (!order) notFound();
 
-  // Still waiting for payment — send user back to checkout
-  if (order.status === "awaiting_payment") {
+  // Verify Xendit status if still awaiting payment
+  if (order.status === "awaiting_payment" && order.paymentReference) {
+    const invoice = await getInvoice(order.paymentReference);
+
+    if (invoice.status === "PAID" || invoice.status === "SETTLED") {
+      await db
+        .update(orders)
+        .set({ status: "pending_confirmation", paidAt: new Date() })
+        .where(eq(orders.id, order.id));
+    } else if (invoice.status === "EXPIRED") {
+      await db
+        .update(orders)
+        .set({ status: "cancelled" })
+        .where(eq(orders.id, order.id));
+      redirect(`/order/cancel?number=${number}`);
+    } else if (invoice.status === "PENDING") {
+      redirect("/checkout");
+    }
+
+    // Re-fetch to get updated status
+    const updated = await getOrderByOrderNumber(orderNumber);
+    if (updated) Object.assign(order, updated);
+  } else if (order.status === "awaiting_payment" && !order.paymentReference) {
     redirect("/checkout");
   }
 

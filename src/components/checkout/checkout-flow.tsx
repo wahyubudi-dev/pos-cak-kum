@@ -45,13 +45,18 @@ export function CheckoutFlow({
     checkNow();
 
     pollRef.current = setInterval(async () => {
-      const result = await confirmPayment(state.orderId);
-      if (result.message?.toLowerCase().includes("kedaluwarsa")) {
-        if (pollRef.current) clearInterval(pollRef.current);
-        router.push(`/order/cancel`);
-      } else if (result.ok) {
-        if (pollRef.current) clearInterval(pollRef.current);
-        router.push(`/order/success?number=${state.orderNumber}`);
+      try {
+        const result = await confirmPayment(state.orderId);
+        console.log("[checkout] poll ok=%s message=%s", result.ok, result.message);
+        if (result.message?.toLowerCase().includes("kedaluwarsa")) {
+          if (pollRef.current) clearInterval(pollRef.current);
+          router.push(`/order/cancel`);
+        } else if (result.ok) {
+          if (pollRef.current) clearInterval(pollRef.current);
+          router.push(`/order/success?number=${state.orderNumber}`);
+        }
+      } catch (e) {
+        console.warn("[checkout] poll error:", e, "retrying...");
       }
     }, 5000);
 
@@ -273,7 +278,7 @@ function PayStep({
             ) : (
               <span className="flex items-center gap-2">
                 <X className="h-4 w-4" />
-                Batalkan
+                Batalkan Pesanan
               </span>
             )}
           </Button>

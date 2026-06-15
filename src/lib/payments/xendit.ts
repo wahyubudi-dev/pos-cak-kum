@@ -8,7 +8,7 @@ function authHeader() {
 export type XenditInvoice = {
   id: string;
   invoice_url: string;
-  status: "PENDING" | "SETTLED" | "EXPIRED";
+  status: "PENDING" | "PAID" | "SETTLED" | "EXPIRED";
   qr_string: string | null;
   expiry_date: string;
   payment_channel: string | null;
@@ -69,6 +69,7 @@ export async function getInvoice(
 ): Promise<XenditInvoice> {
   const res = await fetch(`${XENDIT_API}/v2/invoices/${invoiceId}`, {
     headers: { Authorization: authHeader() },
+    cache: "no-store",
   });
 
   if (!res.ok) {

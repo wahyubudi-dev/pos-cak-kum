@@ -3,7 +3,7 @@ import { and, desc, eq } from "drizzle-orm";
 import { requireAuth } from "@/lib/auth/session";
 import { db } from "@/lib/db";
 import { carts, cartItems, orders, orderItems, type OrderStatus } from "@/lib/db/schema";
-import { createInvoice, getInvoice, generateQrDataUrl } from "@/lib/payments/xendit";
+import { createInvoice, getInvoice, generateQrDataUrl, type XenditInvoice } from "@/lib/payments/xendit";
 
 export type PaymentOrderData = {
   orderId: string;
@@ -87,7 +87,7 @@ export async function createOrderFromCartServer(
   const invoice = await createInvoice({
     externalId: result.id,
     amount: totalAmount,
-    description: `Cak Kum OrderId: #${result.id}`,
+    description: `Cak Kum OrderId: ${result.id}`,
     successRedirectUrl: `${process.env.NEXT_PUBLIC_APP_URL}/order/success?number=${result.orderNumber}`,
     customer: {
       givenNames: user.auth.email?.split("@")[0] ?? "Customer",
@@ -178,7 +178,7 @@ export async function getPendingPaymentOrder(): Promise<PaymentOrderData | null>
     return null;
   }
 
-  const paidStatuses = ["SETTLED", "PAID", "SUCCEEDED"];
+  const paidStatuses: XenditInvoice["status"][] = ["PAID", "SETTLED"];
   if (paidStatuses.includes(invoice.status)) {
     await db
       .update(orders)

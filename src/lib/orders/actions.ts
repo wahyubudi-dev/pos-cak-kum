@@ -7,7 +7,7 @@ import { redirect } from "next/navigation";
 import { requireAuth } from "@/lib/auth/session";
 import { db } from "@/lib/db";
 import { carts, cartItems, orders } from "@/lib/db/schema";
-import { getInvoice, expireInvoice, generateQrDataUrl } from "@/lib/payments/xendit";
+import { getInvoice, expireInvoice, generateQrDataUrl, type XenditInvoice } from "@/lib/payments/xendit";
 
 export type OrderActionState = {
   ok: boolean;
@@ -32,8 +32,9 @@ export async function confirmPayment(
   }
 
   const invoice = await getInvoice(order.paymentReference);
+  console.log("[confirmPayment] orderId=%s invoiceStatus=%s", orderId, invoice.status);
 
-  const paidStatuses = ["SETTLED", "PAID", "SUCCEEDED"];
+  const paidStatuses: XenditInvoice["status"][] = ["PAID", "SETTLED"];
 
   if (paidStatuses.includes(invoice.status)) {
     const cart = await db.query.carts.findFirst({
@@ -87,7 +88,7 @@ export async function confirmPayment(
     return { ok: false, message: "Pembayaran telah kedaluwarsa" };
   }
 
-  return { ok: false, message: `Status Xendit: ${invoice.status}` };
+  return { ok: false, message: "Anda belum melakukan pembayaran, silakan lakukan pembayaran terlebih dahulu" };
 }
 
 export async function cancelCheckout(): Promise<never> {
