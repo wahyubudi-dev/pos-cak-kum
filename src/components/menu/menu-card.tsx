@@ -8,6 +8,7 @@ type MenuCardProps = {
   menu: Menu;
   isAuthenticated: boolean;
   returnPath: string;
+  priority?: boolean;
 };
 
 /**

@@ -1,12 +1,12 @@
 "use client";
 
+import { useRef, useState, useEffect } from "react";
 import {
   BarChart,
   Bar,
   XAxis,
   YAxis,
   Tooltip,
-  ResponsiveContainer,
   CartesianGrid,
   PieChart,
   Pie,
@@ -44,6 +44,7 @@ function abbreviate(value: number): string {
 }
 
 const PIE_COLORS: Record<string, string> = {
+  awaiting_payment: "#f59e0b",
   pending_confirmation: "#f59e0b",
   processing: "#3b82f6",
   ready: "#10b981",
@@ -51,7 +52,34 @@ const PIE_COLORS: Record<string, string> = {
   cancelled: "#ef4444",
 };
 
+function useContainerWidth(ref: React.RefObject<HTMLDivElement | null>) {
+  const [width, setWidth] = useState(0);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+
+    setWidth(el.clientWidth);
+
+    const observer = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        setWidth(entry.contentRect.width);
+      }
+    });
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [ref]);
+
+  return width;
+}
+
 export function DashboardCharts({ barData, pieData }: DashboardChartsProps) {
+  const barRef = useRef<HTMLDivElement>(null);
+  const pieRef = useRef<HTMLDivElement>(null);
+  const barWidth = useContainerWidth(barRef);
+  const pieWidth = useContainerWidth(pieRef);
+
   const chartData = barData.map((d) => ({
     ...d,
     label: DAY_FORMAT.format(new Date(d.day + "T00:00:00")),
@@ -66,9 +94,15 @@ export function DashboardCharts({ barData, pieData }: DashboardChartsProps) {
       <section className="flex flex-col gap-4 rounded-3xl border border-border bg-card p-6">
         <h2 className="font-display text-lg font-semibold">Pendapatan Harian</h2>
         {hasBarData ? (
-          <div className="h-72 min-w-0">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={chartData} barCategoryGap={10} margin={{ top: 8, right: 16, left: -4, bottom: 0 }}>
+          <div ref={barRef} className="h-72 w-full">
+            {barWidth > 0 ? (
+              <BarChart
+                width={barWidth}
+                height={288}
+                data={chartData}
+                barCategoryGap={10}
+                margin={{ top: 8, right: 16, left: -4, bottom: 0 }}
+              >
                 <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" vertical={false} />
                 <XAxis
                   dataKey="label"
@@ -110,7 +144,9 @@ export function DashboardCharts({ barData, pieData }: DashboardChartsProps) {
                   maxBarSize={48}
                 />
               </BarChart>
-            </ResponsiveContainer>
+            ) : (
+              <div className="h-full w-full" />
+            )}
           </div>
         ) : (
           <div className="flex items-center justify-center rounded-2xl border border-dashed border-border bg-pearl py-16 text-sm text-muted-foreground">
@@ -124,9 +160,9 @@ export function DashboardCharts({ barData, pieData }: DashboardChartsProps) {
         <h2 className="font-display text-lg font-semibold">Status Pesanan</h2>
         {hasPieData ? (
           <div className="flex flex-col items-center gap-3">
-            <div className="h-52 w-52">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
+            <div ref={pieRef} className="h-52 w-52">
+              {pieWidth > 0 ? (
+                <PieChart width={208} height={208}>
                   <Pie
                     data={pieData.map((d) => ({ ...d, label: ORDER_STATUS_LABELS[d.status as OrderStatus] ?? d.status }))}
                     dataKey="count"
@@ -159,7 +195,9 @@ export function DashboardCharts({ barData, pieData }: DashboardChartsProps) {
                     }}
                   />
                 </PieChart>
-              </ResponsiveContainer>
+              ) : (
+                <div className="h-full w-full" />
+              )}
             </div>
             <div className="flex flex-wrap justify-center gap-x-4 gap-y-1.5">
               {pieData.filter((d) => d.count > 0).map((d) => (

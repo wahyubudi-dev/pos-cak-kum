@@ -65,12 +65,13 @@ export function MenuSections({
             caption="Pilihan terlaris di Kedai Cak Kum"
           />
           <div className="flex flex-col gap-3">
-            {filteredFeaturedMenus.map((menu) => (
+            {filteredFeaturedMenus.map((menu, i) => (
               <MenuRow
                 key={menu.id}
                 menu={menu}
                 tableNumber={tableNumber}
                 showFire
+                priority={i < 4}
               />
             ))}
           </div>

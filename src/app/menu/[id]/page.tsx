@@ -53,7 +53,7 @@ export default async function MenuDetailPage({
     : `/menu/${id}`;
 
   return (
-    <main className="min-h-screen bg-background pb-44 sm:pb-80">
+    <main className="min-h-screen bg-background pb-44 sm:pb-72">
       {/* Sticky top header */}
       <header className="sticky top-0 z-30 border-b border-border bg-card/90 py-3 backdrop-blur-sm">
         <div className="mx-auto flex max-w-lg items-center justify-between gap-3 px-5 sm:px-6">

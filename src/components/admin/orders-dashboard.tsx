@@ -281,6 +281,7 @@ function FilterTabs({
   const counts = useMemo(() => {
     const map: Record<StatusFilter, number> = {
       all: orders.length,
+      awaiting_payment: 0,
       pending_confirmation: 0,
       processing: 0,
       ready: 0,

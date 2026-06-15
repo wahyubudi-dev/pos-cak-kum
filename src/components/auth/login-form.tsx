@@ -1,58 +1,23 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback } from "react";
+import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
-import { createClient } from "@/lib/supabase/client";
 
 type LoginFormProps = {
-  /**
-   * Path to return to after the OAuth round trip completes. Defaults to
-   * /menu when omitted, matching PRD AUTH-04.
-   */
   redirectTo?: string;
-  /**
-   * Surface-level error message from a previous OAuth attempt, passed
-   * through the URL by the auth callback when something fails.
-   */
   errorMessage?: string;
 };
 
-const FALLBACK_REDIRECT = "/menu";
-
 export function LoginForm({ redirectTo, errorMessage }: LoginFormProps) {
-  const [isPending, setIsPending] = useState(false);
-  const [localError, setLocalError] = useState<string | null>(null);
+  const router = useRouter();
+  const next = redirectTo ?? "/menu";
 
-  async function signInWithGoogle() {
-    setIsPending(true);
-    setLocalError(null);
-
-    const supabase = createClient();
-    const next = redirectTo ?? FALLBACK_REDIRECT;
-    const callbackUrl = new URL("/auth/callback", window.location.origin);
-    callbackUrl.searchParams.set("next", next);
-
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: callbackUrl.toString(),
-        queryParams: {
-          // Force account chooser so users can pick the right Google account
-          // even if they're already signed in to one.
-          prompt: "select_account",
-        },
-      },
-    });
-
-    if (error) {
-      setLocalError(error.message);
-      setIsPending(false);
-    }
-    // On success Supabase redirects the browser; no need to clear isPending.
-  }
-
-  const displayedError = localError ?? errorMessage ?? null;
+  const signInWithGoogle = useCallback(() => {
+    const params = new URLSearchParams({ next });
+    router.push(`/auth/signin?${params}`);
+  }, [next, router]);
 
   return (
     <div className="flex flex-col gap-6 rounded-3xl border border-mist bg-white p-7 shadow-subtle">
@@ -84,20 +49,19 @@ export function LoginForm({ redirectTo, errorMessage }: LoginFormProps) {
       <Button
         type="button"
         onClick={signInWithGoogle}
-        disabled={isPending}
         className="w-full rounded-2xl"
         size="cta"
         variant="primary"
       >
-        {isPending ? "Mengarahkan ke Google..." : "Lanjutkan dengan Google"}
+        Lanjutkan dengan Google
       </Button>
 
-      {displayedError ? (
+      {errorMessage ? (
         <p
           role="alert"
           className="rounded-2xl bg-destructive/10 px-4 py-3 text-sm text-destructive"
         >
-          {displayedError}
+          {errorMessage}
         </p>
       ) : null}
 

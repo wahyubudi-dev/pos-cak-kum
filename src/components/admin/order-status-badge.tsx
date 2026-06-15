@@ -3,6 +3,8 @@ import { cn } from "@/lib/utils";
 import type { OrderStatus } from "@/lib/db/schema";
 
 const STATUS_STYLES: Record<OrderStatus, string> = {
+  awaiting_payment:
+    "bg-cream-paper text-foreground border-border",
   pending_confirmation:
     "bg-cream-paper text-foreground border-border",
   processing:

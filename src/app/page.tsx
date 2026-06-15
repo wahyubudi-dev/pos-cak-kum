@@ -74,7 +74,7 @@ export default function HomePage() {
       </div>
 
       {/* Bottom credit */}
-      <p className="absolute bottom-8 text-xs text-fog-gray">
+      <p className="absolute bottom-7 text-xs text-fog-gray">
         {new Date().getFullYear()} · Kedai Cak Kum
       </p>
     </main>

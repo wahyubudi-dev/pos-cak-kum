@@ -25,6 +25,7 @@ import {
 export const userRoleEnum = pgEnum("user_role", ["customer", "admin"]);
 
 export const orderStatusEnum = pgEnum("order_status", [
+  "awaiting_payment",
   "pending_confirmation",
   "processing",
   "ready",
@@ -160,6 +161,8 @@ export const orders = pgTable(
     tableNumber: text("table_number"),
     paymentReference: text("payment_reference"),
     paymentMethod: text("payment_method"),
+    paymentChannel: text("payment_channel"),
+    paymentExpiry: timestamp("payment_expiry", { withTimezone: true }),
     paidAt: timestamp("paid_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()

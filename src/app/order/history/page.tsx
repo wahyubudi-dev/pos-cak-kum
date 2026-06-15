@@ -260,13 +260,23 @@ function OrderCard({
           ))}
         </div>
 
-        <Link
-          href={`/order/success?number=${order.orderNumber}`}
-          className="mt-3 flex items-center justify-center gap-1 rounded-xl border border-border bg-cream-paper/40 py-2.5 text-[11px] font-medium text-muted-foreground transition-colors hover:bg-cream-paper hover:text-foreground"
-        >
-          Lihat detail pesanan
-          <ChevronRight className="h-3 w-3" />
-        </Link>
+        {order.status === "awaiting_payment" ? (
+          <Link
+            href="/checkout"
+            className="mt-3 flex items-center justify-center gap-1 rounded-xl border border-amber-200 bg-amber-50/50 py-2.5 text-[11px] font-medium text-amber-700 transition-colors hover:bg-amber-100"
+          >
+            Lanjutkan pembayaran
+            <ChevronRight className="h-3 w-3" />
+          </Link>
+        ) : (
+          <Link
+            href={`/order/success?number=${order.orderNumber}`}
+            className="mt-3 flex items-center justify-center gap-1 rounded-xl border border-border bg-cream-paper/40 py-2.5 text-[11px] font-medium text-muted-foreground transition-colors hover:bg-cream-paper hover:text-foreground"
+          >
+            Lihat detail pesanan
+            <ChevronRight className="h-3 w-3" />
+          </Link>
+        )}
       </div>
     </details>
   );
@@ -275,6 +285,7 @@ function OrderCard({
 /* ─── status helpers ──────────────────────────────────────────── */
 
 const STATUS_ACCENT: Record<OrderStatus, string> = {
+  awaiting_payment: "#f59e0b",
   pending_confirmation: "#f59e0b",
   processing: "#3b82f6",
   ready: "#10b981",
@@ -283,6 +294,7 @@ const STATUS_ACCENT: Record<OrderStatus, string> = {
 };
 
 const STATUS_ICONS: Record<OrderStatus, React.ReactNode> = {
+  awaiting_payment: <Clock className="h-3 w-3" />,
   pending_confirmation: <Clock className="h-3 w-3" />,
   processing: <ChefHat className="h-3 w-3" />,
   ready: <BellRing className="h-3 w-3" />,
@@ -292,6 +304,7 @@ const STATUS_ICONS: Record<OrderStatus, React.ReactNode> = {
 
 function StatusBadge({ status }: { status: OrderStatus }) {
   const colors: Record<OrderStatus, string> = {
+    awaiting_payment: "bg-amber-50 text-amber-700 border-amber-200",
     pending_confirmation: "bg-amber-50 text-amber-700 border-amber-200",
     processing: "bg-blue-50 text-blue-700 border-blue-200",
     ready: "bg-emerald-50 text-emerald-700 border-emerald-200",

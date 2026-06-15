@@ -3,139 +3,141 @@
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { z } from "zod";
 
 import { requireAuth } from "@/lib/auth/session";
 import { db } from "@/lib/db";
-import { carts, cartItems, orders, orderItems } from "@/lib/db/schema";
+import { carts, cartItems, orders } from "@/lib/db/schema";
+import { getInvoice, expireInvoice, generateQrDataUrl } from "@/lib/payments/xendit";
 
 export type OrderActionState = {
   ok: boolean;
   message?: string;
 };
 
-const checkoutSchema = z.object({
-  table_number: z
-    .string()
-    .trim()
-    .max(20)
-    .optional()
-    .transform((value) => (value && value.length > 0 ? value : null)),
-});
-
-/**
- * Convert the current user's cart into an order.
- *
- * Wrapped in a Drizzle transaction so all three writes — order header,
- * order items, cart cleanup — succeed together or none at all. With
- * Drizzle + postgres-js this gives us proper atomicity, fixing the
- * non-atomic two-step pattern we had with the supabase-js client.
- *
- * Phase 1 status: 'pending_confirmation'. Admin verifies the static QR
- * payment manually before progressing the order.
- */
-export async function createOrderFromCart(
-  formData: FormData,
-): Promise<OrderActionState> {
+export async function confirmPayment(
+  orderId: string,
+): Promise<{ ok: boolean; message?: string }> {
   const user = await requireAuth("/checkout");
 
-  const parsed = checkoutSchema.safeParse({
-    table_number: formData.get("table_number") ?? "",
+  const order = await db.query.orders.findFirst({
+    columns: { id: true, paymentReference: true, orderNumber: true },
+    where: eq(orders.id, orderId),
   });
-  if (!parsed.success) {
-    return { ok: false, message: "Nomor meja tidak valid" };
+
+  if (!order) {
+    return { ok: false, message: "Pesanan tidak ditemukan" };
+  }
+  if (!order.paymentReference) {
+    return { ok: false, message: "Belum ada referensi pembayaran" };
+  }
+
+  const invoice = await getInvoice(order.paymentReference);
+
+  const paidStatuses = ["SETTLED", "PAID", "SUCCEEDED"];
+
+  if (paidStatuses.includes(invoice.status)) {
+    const cart = await db.query.carts.findFirst({
+      columns: { id: true },
+      where: eq(carts.userId, user.auth.id),
+    });
+
+    await db.transaction(async (tx) => {
+      await tx
+        .update(orders)
+        .set({
+          status: "pending_confirmation",
+          paidAt: new Date(),
+        })
+        .where(eq(orders.id, orderId));
+
+      if (cart) {
+        await tx.delete(cartItems).where(eq(cartItems.cartId, cart.id));
+      }
+    });
+
+    revalidatePath("/cart");
+    revalidatePath("/menu");
+    revalidatePath("/admin");
+    revalidatePath("/admin/orders");
+
+    return { ok: true };
+  }
+
+  if (invoice.status === "EXPIRED") {
+    const cart = await db.query.carts.findFirst({
+      columns: { id: true },
+      where: eq(carts.userId, user.auth.id),
+    });
+
+    await db.transaction(async (tx) => {
+      await tx
+        .update(orders)
+        .set({ status: "cancelled" })
+        .where(eq(orders.id, orderId));
+
+      if (cart) {
+        await tx.delete(cartItems).where(eq(cartItems.cartId, cart.id));
+      }
+    });
+
+    revalidatePath("/cart");
+    revalidatePath("/admin");
+    revalidatePath("/admin/orders");
+
+    return { ok: false, message: "Pembayaran telah kedaluwarsa" };
+  }
+
+  return { ok: false, message: `Status Xendit: ${invoice.status}` };
+}
+
+export async function cancelCheckout(): Promise<never> {
+  await requireAuth("/checkout");
+  redirect("/order/cancel");
+}
+
+export async function cancelPendingPayment(
+  orderId: string,
+): Promise<{ ok: boolean; message?: string }> {
+  const user = await requireAuth("/checkout");
+
+  const order = await db.query.orders.findFirst({
+    columns: { id: true, userId: true, status: true, paymentReference: true },
+    where: eq(orders.id, orderId),
+  });
+
+  if (!order || order.userId !== user.auth.id) {
+    return { ok: false, message: "Pesanan tidak ditemukan" };
+  }
+
+  if (order.status !== "awaiting_payment") {
+    return { ok: false, message: "Pesanan sudah diproses" };
+  }
+
+  // Expire invoice in Xendit first
+  if (order.paymentReference) {
+    await expireInvoice(order.paymentReference);
   }
 
   const cart = await db.query.carts.findFirst({
     columns: { id: true },
     where: eq(carts.userId, user.auth.id),
-    with: {
-      items: {
-        with: {
-          menu: {
-            columns: {
-              id: true,
-              name: true,
-              price: true,
-              isActive: true,
-            },
-          },
-        },
-      },
-    },
   });
 
-  if (!cart || cart.items.length === 0) {
-    return { ok: false, message: "Keranjang kosong" };
-  }
+  await db.transaction(async (tx) => {
+    await tx
+      .update(orders)
+      .set({ status: "cancelled" })
+      .where(eq(orders.id, orderId));
 
-  const inactiveItems = cart.items.filter(
-    (item) => !item.menu || !item.menu.isActive,
-  );
-  if (inactiveItems.length > 0) {
-    return {
-      ok: false,
-      message:
-        "Ada menu di keranjang yang sudah tidak tersedia. Hapus dulu sebelum bayar.",
-    };
-  }
-
-  let totalAmount = 0;
-  for (const item of cart.items) {
-    if (!item.menu) continue;
-    const unitPrice = item.unitPrice ? Number(item.unitPrice) : Number(item.menu.price);
-    totalAmount += unitPrice * item.quantity;
-  }
-
-  let orderNumber: number;
-  try {
-    orderNumber = await db.transaction(async (tx) => {
-      const [created] = await tx
-        .insert(orders)
-        .values({
-          userId: user.auth.id,
-          totalAmount: totalAmount.toString(),
-          tableNumber: parsed.data.table_number,
-        })
-        .returning({ id: orders.id, orderNumber: orders.orderNumber });
-
-      if (!created) throw new Error("Gagal membuat header pesanan");
-
-      await tx.insert(orderItems).values(
-        cart.items
-          .filter((item) => item.menu)
-          .map((item) => ({
-            orderId: created.id,
-            menuId: item.menuId,
-            quantity: item.quantity,
-            // Snapshot the price; historical orders never re-price.
-            unitPrice: item.unitPrice ?? item.menu!.price,
-            notes: item.notes,
-            size: item.size,
-          })),
-      );
-
+    if (cart) {
       await tx.delete(cartItems).where(eq(cartItems.cartId, cart.id));
-
-      return created.orderNumber;
-    });
-  } catch (error) {
-    return {
-      ok: false,
-      message:
-        error instanceof Error ? error.message : "Gagal membuat pesanan",
-    };
-  }
+    }
+  });
 
   revalidatePath("/cart");
   revalidatePath("/menu");
   revalidatePath("/admin");
   revalidatePath("/admin/orders");
 
-  redirect(`/order/success?number=${orderNumber}`);
-}
-
-export async function cancelCheckout(): Promise<never> {
-  await requireAuth("/checkout");
-  redirect("/order/cancel");
+  return { ok: true };
 }

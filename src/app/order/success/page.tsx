@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { Check, Clock, ChefHat, BellRing, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -27,6 +27,11 @@ export default async function OrderSuccessPage({
 
   const order = await getOrderByOrderNumber(orderNumber);
   if (!order) notFound();
+
+  // Still waiting for payment — send user back to checkout
+  if (order.status === "awaiting_payment") {
+    redirect("/checkout");
+  }
 
   const isCancelled = order.status === "cancelled";
   const formattedNumber = `#${number.padStart(3, "0")}`;
@@ -231,6 +236,7 @@ function StatusDot({ status }: { status: OrderStatus }) {
   }
 
   const colorMap: Record<OrderStatus, string> = {
+    awaiting_payment: "bg-amber-400",
     pending_confirmation: "bg-amber-400",
     processing: "bg-blue-500",
     ready: "bg-emerald-500",

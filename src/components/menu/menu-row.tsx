@@ -10,6 +10,8 @@ type MenuRowProps = {
   tableNumber: string | null;
   /** Show fire stack badge for featured/recommended items */
   showFire?: boolean;
+  /** Prioritize image loading for above-the-fold items */
+  priority?: boolean;
 };
 
 /**
@@ -17,7 +19,7 @@ type MenuRowProps = {
  * Smaller image (72×72), playful rounded corners, soft pastel shadow.
  * Click → /menu/[id]?table=N
  */
-export function MenuRow({ menu, tableNumber, showFire = false }: MenuRowProps) {
+export function MenuRow({ menu, tableNumber, showFire = false, priority = false }: MenuRowProps) {
   const href = tableNumber
     ? `/menu/${menu.id}?table=${encodeURIComponent(tableNumber)}`
     : `/menu/${menu.id}`;
@@ -39,6 +41,7 @@ export function MenuRow({ menu, tableNumber, showFire = false }: MenuRowProps) {
             alt={menu.name}
             fill
             sizes="72px"
+            priority={priority}
             className="object-cover transition-transform duration-300 group-hover:scale-[1.06]"
           />
         ) : (
