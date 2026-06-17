@@ -30,7 +30,11 @@ export default async function AdminUsersPage() {
         </p>
       </header>
 
-      <UsersManager users={userViews} currentUserId={admin.auth.id} />
+      <UsersManager
+        users={userViews}
+        currentUserId={admin.auth.id}
+        masterAdminEmail={process.env.MASTER_ADMIN_EMAIL}
+      />
     </div>
   );
 }

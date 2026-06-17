@@ -23,6 +23,7 @@ type UserView = {
 type UsersManagerProps = {
   users: UserView[];
   currentUserId: string;
+  masterAdminEmail?: string;
 };
 
 type RoleFilter = UserRole | "all";
@@ -39,7 +40,11 @@ const DATE_FORMAT = new Intl.DateTimeFormat("id-ID", {
   year: "numeric",
 });
 
-export function UsersManager({ users, currentUserId }: UsersManagerProps) {
+export function UsersManager({
+  users,
+  currentUserId,
+  masterAdminEmail,
+}: UsersManagerProps) {
   const [filter, setFilter] = useState<RoleFilter>("all");
   const [search, setSearch] = useState("");
 
@@ -109,7 +114,11 @@ export function UsersManager({ users, currentUserId }: UsersManagerProps) {
         <ul className="flex flex-col gap-3">
           {filtered.map((user) => (
             <li key={user.id}>
-              <UserRow user={user} isSelf={user.id === currentUserId} />
+              <UserRow
+                user={user}
+                isSelf={user.id === currentUserId}
+                masterAdminEmail={masterAdminEmail}
+              />
             </li>
           ))}
         </ul>
@@ -145,15 +154,31 @@ function SummaryStat({
   );
 }
 
-function UserRow({ user, isSelf }: { user: UserView; isSelf: boolean }) {
+function UserRow({
+  user,
+  isSelf,
+  masterAdminEmail,
+}: {
+  user: UserView;
+  isSelf: boolean;
+  masterAdminEmail?: string;
+}) {
   const [role, setRole] = useState(user.role);
   const [isPending, startTransition] = useTransition();
 
   const isAdmin = role === "admin";
 
+  const isMasterAdmin =
+    user.email === masterAdminEmail;
+
   function handleToggleRole() {
     if (isSelf) {
       toast.error("Tidak bisa mengubah role akunmu sendiri");
+      return;
+    }
+
+    if (isMasterAdmin) {
+      toast.error("Master admin tidak bisa diturunkan role-nya");
       return;
     }
 
@@ -180,6 +205,7 @@ function UserRow({ user, isSelf }: { user: UserView; isSelf: boolean }) {
             <img
               src={user.avatarUrl}
               alt={user.fullName ?? user.email}
+              referrerPolicy="no-referrer"
               className="h-full w-full object-cover"
             />
           ) : (
@@ -208,6 +234,11 @@ function UserRow({ user, isSelf }: { user: UserView; isSelf: boolean }) {
                 Pelanggan
               </Badge>
             )}
+            {isMasterAdmin ? (
+              <Badge className="rounded-full bg-amber-500 text-white hover:bg-amber-500">
+                Master
+              </Badge>
+            ) : null}
           </div>
           <span className="truncate text-xs text-muted-foreground">
             {user.email} · Bergabung {DATE_FORMAT.format(new Date(user.createdAt))}
@@ -215,38 +246,44 @@ function UserRow({ user, isSelf }: { user: UserView; isSelf: boolean }) {
         </div>
       </div>
 
-      <ConfirmDialog
-        trigger={
-          <Button
-            type="button"
-            size="sm"
-            variant={isAdmin ? "ghost" : "default"}
-            disabled={isPending || isSelf}
-            className={cn(
-              "rounded-lg whitespace-nowrap",
-              isAdmin
-                ? "text-destructive hover:bg-destructive/10 hover:text-destructive"
-                : "bg-brand-teal text-white hover:bg-brand-teal/90",
-            )}
-            title={isSelf ? "Tidak bisa mengubah role akun sendiri" : undefined}
-          >
-            {isPending
-              ? "..."
-              : isAdmin
-                ? "Turunkan ke Pelanggan"
-                : "Jadikan Admin"}
-          </Button>
-        }
-        title={isAdmin ? "Turunkan pengguna?" : "Jadikan admin?"}
-        description={
-          isAdmin
-            ? `${user.fullName ?? user.email} akan kehilangan akses admin dan menjadi pelanggan biasa.`
-            : `${user.fullName ?? user.email} akan mendapatkan akses penuh ke panel admin.`
-        }
-        confirmLabel={isAdmin ? "Turunkan" : "Jadikan Admin"}
-        tone={isAdmin ? "destructive" : "default"}
-        onConfirm={handleToggleRole}
-      />
+      {isMasterAdmin ? null : (
+        <ConfirmDialog
+          trigger={
+            <Button
+              type="button"
+              size="sm"
+              variant={isAdmin ? "ghost" : "default"}
+              disabled={isPending || isSelf}
+              className={cn(
+                "rounded-lg whitespace-nowrap",
+                isAdmin
+                  ? "text-destructive hover:bg-destructive/10 hover:text-destructive"
+                  : "bg-brand-teal text-white hover:bg-brand-teal/90",
+              )}
+              title={
+                isSelf
+                  ? "Tidak bisa mengubah role akun sendiri"
+                  : undefined
+              }
+            >
+              {isPending
+                ? "..."
+                : isAdmin
+                  ? "Turunkan ke Pelanggan"
+                  : "Jadikan Admin"}
+            </Button>
+          }
+          title={isAdmin ? "Turunkan pengguna?" : "Jadikan admin?"}
+          description={
+            isAdmin
+              ? `${user.fullName ?? user.email} akan kehilangan akses admin dan menjadi pelanggan biasa.`
+              : `${user.fullName ?? user.email} akan mendapatkan akses penuh ke panel admin.`
+          }
+          confirmLabel={isAdmin ? "Turunkan" : "Jadikan Admin"}
+          tone={isAdmin ? "destructive" : "default"}
+          onConfirm={handleToggleRole}
+        />
+      )}
     </article>
   );
 }

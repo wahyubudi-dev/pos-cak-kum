@@ -8,14 +8,19 @@ import { db } from "@/lib/db";
 import { users } from "@/lib/db/schema";
 import type { UserRole } from "@/lib/db/schema";
 
+const MASTER_ADMIN_EMAIL = process.env.MASTER_ADMIN_EMAIL;
+
 export type UserActionState = {
   ok: boolean;
   message?: string;
 };
 
+const ROLE_ADMIN = "admin" as const;
+const ROLE_CUSTOMER = "customer" as const;
+
 const ROLE_LABELS: Record<UserRole, string> = {
-  customer: "Pelanggan",
-  admin: "Admin",
+  [ROLE_CUSTOMER]: "Pelanggan",
+  [ROLE_ADMIN]: "Admin",
 };
 
 export async function updateUserRole(
@@ -24,11 +29,26 @@ export async function updateUserRole(
 ): Promise<UserActionState> {
   const currentAdmin = await requireAdmin();
 
-  if (userId === currentAdmin.auth.id && nextRole !== "admin") {
+  if (userId === currentAdmin.auth.id && nextRole !== ROLE_ADMIN) {
     return {
       ok: false,
       message: "Tidak bisa menurunkan role akunmu sendiri.",
     };
+  }
+
+  if (MASTER_ADMIN_EMAIL && nextRole !== ROLE_ADMIN) {
+    const targetUser = await db
+      .select({ email: users.email })
+      .from(users)
+      .where(eq(users.id, userId))
+      .then((rows) => rows[0]);
+
+    if (targetUser && targetUser.email === MASTER_ADMIN_EMAIL) {
+      return {
+        ok: false,
+        message: "Master admin tidak bisa diturunkan role-nya.",
+      };
+    }
   }
 
   try {
