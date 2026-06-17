@@ -27,7 +27,7 @@ type StatusData = {
   count: number;
 };
 
-type DashboardChartsProps = {
+export type DashboardChartsProps = {
   barData: ChartData[];
   pieData: StatusData[];
 };

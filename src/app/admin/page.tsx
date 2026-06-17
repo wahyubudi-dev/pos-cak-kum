@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { DashboardCharts } from "@/components/admin/dashboard-charts";
+import { DynamicDashboardCharts } from "@/components/admin/dynamic-dashboard-charts";
 import { OrderStatusBadge } from "@/components/admin/order-status-badge";
 import { Button } from "@/components/ui/button";
 import { requireAdmin } from "@/lib/auth/session";
@@ -106,7 +106,7 @@ export default async function AdminDashboardPage(props: { searchParams: SearchPa
             </Button>
           </form>
         </div>
-        <DashboardCharts barData={chartData} pieData={statusData} />
+        <DynamicDashboardCharts barData={chartData} pieData={statusData} />
       </section>
 
       <section className="flex flex-col gap-4 rounded-3xl border border-border bg-card p-6">
