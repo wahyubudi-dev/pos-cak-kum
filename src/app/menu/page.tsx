@@ -1,14 +1,15 @@
+import { Suspense } from "react";
+
 import { GreetingHeader } from "@/components/menu/greeting-header";
 import { HeroCarousel } from "@/components/menu/hero-carousel";
 import { MenuBrowser } from "@/components/menu/menu-browser";
-import { CartFab } from "@/components/menu/cart-fab";
+import { CartFabAsync } from "@/components/menu/cart-fab-async";
 import {
   getFeaturedMenus,
   getActiveMenusByCategoryWithPopularity,
 } from "@/lib/menus/queries";
 import { getActiveBanners } from "@/lib/banners/queries";
 import { getCurrentUser } from "@/lib/auth/session";
-import { getCurrentUserCart } from "@/lib/cart/queries";
 
 type SearchParams = Promise<{ table?: string }>;
 
@@ -40,8 +41,6 @@ export default async function MenuPage({
     ? `/menu?table=${encodeURIComponent(tableNumber)}`
     : "/menu";
 
-  const cart = user ? await getCurrentUserCart() : null;
-
   return (
     <main className="min-h-screen bg-white pb-36">
       {/* 1. Sticky greeting header */}
@@ -72,18 +71,10 @@ export default async function MenuPage({
         )}
       </div>
 
-      {/* 6. Bottom dark nav bar */}
-      {cart && cart.totalQuantity > 0 ? (
-        <CartFab
-          itemCount={cart.totalQuantity}
-          totalAmount={cart.totalAmount}
-          href={
-            tableNumber
-              ? `/cart?table=${encodeURIComponent(tableNumber)}`
-              : "/cart"
-          }
-        />
-      ) : null}
+      {/* 6. Bottom dark nav bar (streamed) */}
+      <Suspense fallback={null}>
+        <CartFabAsync tableNumber={tableNumber} />
+      </Suspense>
     </main>
   );
 }
