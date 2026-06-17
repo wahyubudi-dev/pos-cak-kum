@@ -1,34 +1,56 @@
 import { NextResponse } from "next/server";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
+import { z } from "zod";
 
+import { checkRateLimit } from "@/lib/rate-limit";
 import { db } from "@/lib/db";
 import { orders } from "@/lib/db/schema";
 
-type XenditCallback = {
-  id: string;
-  external_id: string;
-  status: "PENDING" | "PAID" | "SETTLED" | "EXPIRED";
-  paid_at: string | null;
-  payment_channel: string | null;
-  payment_method: string | null;
-};
+const webhookSchema = z.object({
+  id: z.string().min(1),
+  external_id: z.string().uuid(),
+  status: z.enum(["PENDING", "PAID", "SETTLED", "EXPIRED"]),
+  paid_at: z.string().nullable(),
+  payment_channel: z.string().nullable(),
+  payment_method: z.string().nullable(),
+});
+
+const WEBHOOK_PAID_STATUSES = ["PAID", "SETTLED"] as const;
+
+const IP_HEADERS = ["x-forwarded-for", "x-real-ip", "cf-connecting-ip"];
 
 export async function POST(request: Request) {
   try {
-    const body: XenditCallback = await request.json();
+    const ip = IP_HEADERS
+      .map((h) => request.headers.get(h))
+      .find(Boolean)
+      ?.split(",")[0]
+      ?.trim()
+      ?? "unknown";
+
+    if (!checkRateLimit(ip)) {
+      return NextResponse.json({ error: "too many requests" }, { status: 429 });
+    }
+
     const callbackToken = request.headers.get("x-callback-token");
 
-    const isVerified = verifyWebhook(body, callbackToken);
+    const isVerified = verifyWebhook(null, callbackToken);
     if (!isVerified) {
       return NextResponse.json({ error: "invalid token" }, { status: 401 });
     }
 
-    const paidStatuses: XenditCallback["status"][] = ["PAID", "SETTLED"];
-    if (!paidStatuses.includes(body.status)) {
-      return NextResponse.json({ received: true });
+    const raw = await request.json();
+    const result = webhookSchema.safeParse(raw);
+
+    if (!result.success) {
+      return NextResponse.json({ error: "invalid payload" }, { status: 400 });
     }
 
-    const externalId = body.external_id;
+    const body = result.data;
+
+    if (!WEBHOOK_PAID_STATUSES.includes(body.status as typeof WEBHOOK_PAID_STATUSES[number])) {
+      return NextResponse.json({ received: true });
+    }
 
     await db
       .update(orders)
@@ -37,9 +59,14 @@ export async function POST(request: Request) {
         paymentReference: body.id,
         paymentMethod: body.payment_method,
         paymentChannel: body.payment_channel,
-        paidAt: body.paid_at ? new Date(body.paid_at) : new Date(),
+        paidAt: body.paid_at ? new Date(body.paid_at) : null,
       })
-      .where(eq(orders.id, externalId));
+      .where(
+        and(
+          eq(orders.id, body.external_id),
+          eq(orders.status, "awaiting_payment"),
+        ),
+      );
 
     return NextResponse.json({ received: true });
   } catch (error) {
@@ -52,8 +79,8 @@ function verifyWebhook(
   _payload: unknown,
   callbackToken: string | null,
 ): boolean {
-  if (!callbackToken) return true;
   const token = process.env.XENDIT_WEBHOOK_TOKEN;
   if (!token) return true;
+  if (!callbackToken) return false;
   return callbackToken === token;
 }

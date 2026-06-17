@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { CheckoutFlow } from "@/components/checkout/checkout-flow";
 import { getCurrentUserCart } from "@/lib/cart/queries";
-import { getPendingPaymentOrder, createOrderFromCartServer } from "@/lib/orders/pending";
+import { reconcilePendingPaymentOrder, createOrderFromCartServer } from "@/lib/orders/pending";
 
 type SearchParams = Promise<{ table?: string }>;
 
@@ -25,7 +25,7 @@ export default async function CheckoutPage({
     : "/menu";
 
   // 1) Check for existing unpaid order
-  const pendingOrder = await getPendingPaymentOrder();
+  const pendingOrder = await reconcilePendingPaymentOrder();
 
   if (pendingOrder) {
     return (

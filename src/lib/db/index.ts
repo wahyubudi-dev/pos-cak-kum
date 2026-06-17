@@ -11,6 +11,7 @@ if (!connectionString) {
 const client = postgres(connectionString, {
   prepare: false,
   max: 10,
+  ssl: "require",
 });
 
 const globalForDb = globalThis as unknown as {

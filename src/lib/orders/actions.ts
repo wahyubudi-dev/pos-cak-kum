@@ -1,6 +1,6 @@
 "use server";
 
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
@@ -21,7 +21,7 @@ export async function confirmPayment(
 
   const order = await db.query.orders.findFirst({
     columns: { id: true, paymentReference: true, orderNumber: true },
-    where: eq(orders.id, orderId),
+    where: and(eq(orders.id, orderId), eq(orders.userId, user.auth.id)),
   });
 
   if (!order) {

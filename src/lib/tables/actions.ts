@@ -57,12 +57,11 @@ export async function createTable(
       isActive: parsed.value.is_active,
     });
   } catch (error) {
+    console.error("[createTable]", error);
     const message =
       error instanceof Error && error.message.includes("unique")
         ? `Label "${parsed.value.label}" sudah ada`
-        : error instanceof Error
-          ? error.message
-          : "Gagal menyimpan";
+        : "Gagal menyimpan";
     return { ok: false, message };
   }
 
@@ -89,12 +88,11 @@ export async function updateTable(
       })
       .where(eq(tables.id, id));
   } catch (error) {
+    console.error("[updateTable]", error);
     const message =
       error instanceof Error && error.message.includes("unique")
         ? `Label "${parsed.value.label}" sudah ada`
-        : error instanceof Error
-          ? error.message
-          : "Gagal menyimpan";
+        : "Gagal menyimpan";
     return { ok: false, message };
   }
 
@@ -107,7 +105,8 @@ export async function deleteTable(id: string): Promise<TableActionState> {
   try {
     await db.delete(tables).where(eq(tables.id, id));
   } catch (error) {
-    return { ok: false, message: error instanceof Error ? error.message : "Gagal menghapus" };
+    console.error("[deleteTable]", error);
+    return { ok: false, message: "Gagal menghapus" };
   }
   revalidatePath("/admin/tables");
   return { ...EMPTY_STATE, message: "Meja dihapus" };
@@ -124,7 +123,8 @@ export async function toggleTableActive(
       .set({ isActive: nextValue, updatedAt: new Date() })
       .where(eq(tables.id, id));
   } catch (error) {
-    return { ok: false, message: error instanceof Error ? error.message : "Gagal mengubah status" };
+    console.error("[toggleTableActive]", error);
+    return { ok: false, message: "Gagal mengubah status" };
   }
   revalidatePath("/admin/tables");
   return EMPTY_STATE;

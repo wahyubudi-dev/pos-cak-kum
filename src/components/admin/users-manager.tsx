@@ -18,12 +18,12 @@ type UserView = {
   avatarUrl: string | null;
   role: UserRole;
   createdAt: string;
+  isMasterAdmin?: boolean;
 };
 
 type UsersManagerProps = {
   users: UserView[];
   currentUserId: string;
-  masterAdminEmail?: string;
 };
 
 type RoleFilter = UserRole | "all";
@@ -40,11 +40,7 @@ const DATE_FORMAT = new Intl.DateTimeFormat("id-ID", {
   year: "numeric",
 });
 
-export function UsersManager({
-  users,
-  currentUserId,
-  masterAdminEmail,
-}: UsersManagerProps) {
+export function UsersManager({ users, currentUserId }: UsersManagerProps) {
   const [filter, setFilter] = useState<RoleFilter>("all");
   const [search, setSearch] = useState("");
 
@@ -114,11 +110,7 @@ export function UsersManager({
         <ul className="flex flex-col gap-3">
           {filtered.map((user) => (
             <li key={user.id}>
-              <UserRow
-                user={user}
-                isSelf={user.id === currentUserId}
-                masterAdminEmail={masterAdminEmail}
-              />
+              <UserRow user={user} isSelf={user.id === currentUserId} />
             </li>
           ))}
         </ul>
@@ -157,19 +149,15 @@ function SummaryStat({
 function UserRow({
   user,
   isSelf,
-  masterAdminEmail,
 }: {
   user: UserView;
   isSelf: boolean;
-  masterAdminEmail?: string;
 }) {
   const [role, setRole] = useState(user.role);
   const [isPending, startTransition] = useTransition();
 
   const isAdmin = role === "admin";
-
-  const isMasterAdmin =
-    user.email === masterAdminEmail;
+  const isMasterAdmin = user.isMasterAdmin ?? false;
 
   function handleToggleRole() {
     if (isSelf) {

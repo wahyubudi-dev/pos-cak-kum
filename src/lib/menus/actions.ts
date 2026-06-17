@@ -103,7 +103,7 @@ async function uploadMenuImage(file: File | null): Promise<string | null> {
     .upload(path, file, { contentType: file.type, upsert: false });
 
   if (error) {
-    throw new Error(`Gagal upload gambar: ${error.message}`);
+    throw new Error("Gagal upload gambar");
   }
 
   const { data } = supabase.storage.from(MENU_BUCKET).getPublicUrl(path);
@@ -138,9 +138,10 @@ export async function createMenu(
   try {
     imageUrl = await uploadMenuImage(formData.get("image") as File | null);
   } catch (error) {
+    console.error("[createMenu] upload", error);
     return {
       ok: false,
-      message: error instanceof Error ? error.message : "Upload gagal",
+      message: "Upload gagal",
     };
   }
 
@@ -157,9 +158,10 @@ export async function createMenu(
     });
   } catch (error) {
     if (imageUrl) await deleteStoredImage(imageUrl);
+    console.error("[createMenu] db insert", error);
     return {
       ok: false,
-      message: error instanceof Error ? error.message : "Gagal menyimpan menu",
+      message: "Gagal menyimpan menu",
     };
   }
 
@@ -191,9 +193,10 @@ export async function updateMenu(
     try {
       imageUrl = (await uploadMenuImage(fileField)) ?? undefined;
     } catch (error) {
+      console.error("[updateMenu] upload", error);
       return {
         ok: false,
-        message: error instanceof Error ? error.message : "Upload gagal",
+        message: "Upload gagal",
       };
     }
   }
@@ -215,9 +218,10 @@ export async function updateMenu(
       .where(eq(menus.id, id));
   } catch (error) {
     if (imageUrl) await deleteStoredImage(imageUrl);
+    console.error("[updateMenu] db insert", error);
     return {
       ok: false,
-      message: error instanceof Error ? error.message : "Gagal menyimpan menu",
+      message: "Gagal menyimpan menu",
     };
   }
 
@@ -239,16 +243,15 @@ export async function deleteMenu(id: string): Promise<MenuActionState> {
   try {
     await db.delete(menus).where(eq(menus.id, id));
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Gagal menghapus";
-    // Postgres FK violation code is 23503; surface a friendlier hint.
-    if (message.includes("23503") || message.includes("foreign key")) {
+    console.error("[deleteMenu]", error);
+    if (error instanceof Error && (error.message.includes("23503") || error.message.includes("foreign key"))) {
       return {
         ok: false,
         message:
           "Menu masih dipakai di pesanan. Nonaktifkan saja agar tetap muncul di histori.",
       };
     }
-    return { ok: false, message };
+    return { ok: false, message: "Gagal menghapus" };
   }
 
   if (existing?.imageUrl) await deleteStoredImage(existing.imageUrl);
@@ -270,9 +273,10 @@ export async function toggleMenuActive(
       .set({ isActive: nextValue, updatedAt: new Date() })
       .where(eq(menus.id, id));
   } catch (error) {
+    console.error("[toggleMenuActive]", error);
     return {
       ok: false,
-      message: error instanceof Error ? error.message : "Gagal mengubah status",
+      message: "Gagal mengubah status",
     };
   }
 

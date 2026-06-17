@@ -1,4 +1,5 @@
 import { CategoriesManager } from "@/components/admin/categories-manager";
+import { requireAdmin } from "@/lib/auth/session";
 import { getCategories } from "@/lib/menus/queries";
 
 export const metadata = {
@@ -6,6 +7,7 @@ export const metadata = {
 };
 
 export default async function AdminCategoriesPage() {
+  await requireAdmin();
   const categories = await getCategories();
 
   return (

@@ -57,9 +57,10 @@ export async function updateUserRole(
       .set({ role: nextRole, updatedAt: new Date() })
       .where(eq(users.id, userId));
   } catch (error) {
+    console.error("[updateUserRole]", error);
     return {
       ok: false,
-      message: error instanceof Error ? error.message : "Gagal menyimpan",
+      message: "Gagal menyimpan",
     };
   }
 

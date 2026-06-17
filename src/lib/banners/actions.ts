@@ -95,7 +95,7 @@ async function uploadBannerImage(file: File | null): Promise<string | null> {
     .from(BANNER_BUCKET)
     .upload(path, file, { contentType: file.type, upsert: false });
 
-  if (error) throw new Error(`Gagal upload gambar: ${error.message}`);
+  if (error) throw new Error("Gagal upload gambar");
 
   const { data } = supabase.storage.from(BANNER_BUCKET).getPublicUrl(path);
   return data.publicUrl;
@@ -123,7 +123,8 @@ export async function createBanner(
   try {
     imageUrl = await uploadBannerImage(formData.get("image") as File | null);
   } catch (error) {
-    return { ok: false, message: error instanceof Error ? error.message : "Upload gagal" };
+    console.error("[createBanner] upload", error);
+    return { ok: false, message: "Upload gagal" };
   }
 
   try {
@@ -141,7 +142,8 @@ export async function createBanner(
     });
   } catch (error) {
     if (imageUrl) await deleteStoredImage(imageUrl);
-    return { ok: false, message: error instanceof Error ? error.message : "Gagal menyimpan" };
+    console.error("[createBanner] db", error);
+    return { ok: false, message: "Gagal menyimpan" };
   }
 
   revalidatePath("/admin/banners");
@@ -171,7 +173,8 @@ export async function updateBanner(
     try {
       imageUrl = (await uploadBannerImage(fileField)) ?? undefined;
     } catch (error) {
-      return { ok: false, message: error instanceof Error ? error.message : "Upload gagal" };
+      console.error("[updateBanner] upload", error);
+      return { ok: false, message: "Upload gagal" };
     }
   }
 
@@ -194,7 +197,8 @@ export async function updateBanner(
       .where(eq(banners.id, id));
   } catch (error) {
     if (imageUrl) await deleteStoredImage(imageUrl);
-    return { ok: false, message: error instanceof Error ? error.message : "Gagal menyimpan" };
+    console.error("[updateBanner] db", error);
+    return { ok: false, message: "Gagal menyimpan" };
   }
 
   if (oldImageUrl) await deleteStoredImage(oldImageUrl);
@@ -214,7 +218,8 @@ export async function deleteBanner(id: string): Promise<BannerActionState> {
   try {
     await db.delete(banners).where(eq(banners.id, id));
   } catch (error) {
-    return { ok: false, message: error instanceof Error ? error.message : "Gagal menghapus" };
+    console.error("[deleteBanner]", error);
+    return { ok: false, message: "Gagal menghapus" };
   }
 
   if (existing?.imageUrl) await deleteStoredImage(existing.imageUrl);
@@ -235,7 +240,8 @@ export async function toggleBannerActive(
       .set({ isActive: nextValue, updatedAt: new Date() })
       .where(eq(banners.id, id));
   } catch (error) {
-    return { ok: false, message: error instanceof Error ? error.message : "Gagal mengubah status" };
+    console.error("[toggleBannerActive]", error);
+    return { ok: false, message: "Gagal mengubah status" };
   }
   revalidatePath("/admin/banners");
   revalidatePath("/menu");

@@ -47,9 +47,10 @@ export async function updateOrderStatus(
       .set({ status: nextStatus, updatedAt: new Date() })
       .where(eq(orders.id, orderId));
   } catch (error) {
+    console.error("[updateOrderStatus]", error);
     return {
       ok: false,
-      message: error instanceof Error ? error.message : "Gagal menyimpan",
+      message: "Gagal menyimpan",
     };
   }
 

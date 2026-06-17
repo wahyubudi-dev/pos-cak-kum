@@ -334,9 +334,12 @@ export async function getOrdersByUser(
  */
 export async function getOrderByOrderNumber(
   orderNumber: number,
+  userId?: string,
 ): Promise<AdminOrder | null> {
   const row = await db.query.orders.findFirst({
-    where: eq(orders.orderNumber, orderNumber),
+    where: userId
+      ? and(eq(orders.orderNumber, orderNumber), eq(orders.userId, userId))
+      : eq(orders.orderNumber, orderNumber),
     with: {
       customer: {
         columns: { id: true, fullName: true, email: true },

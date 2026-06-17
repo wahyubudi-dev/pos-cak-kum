@@ -125,7 +125,7 @@ function PayStep({
           toast.error(result.message ?? "Gagal membatalkan pesanan");
         }
       } catch (e) {
-        toast.error(e instanceof Error ? e.message : "Gagal membatalkan pesanan");
+        toast.error("Gagal membatalkan pesanan");
       }
     });
   }

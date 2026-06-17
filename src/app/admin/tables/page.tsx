@@ -1,9 +1,11 @@
 import { TablesManager } from "@/components/admin/tables-manager";
+import { requireAdmin } from "@/lib/auth/session";
 import { getAllTables } from "@/lib/tables/queries";
 
 export const metadata = { title: "Meja · Admin Kedai Cak Kum" };
 
 export default async function AdminTablesPage() {
+  await requireAdmin();
   const allTables = await getAllTables();
 
   const mapped = allTables.map((t) => ({

@@ -1,9 +1,11 @@
 import { BannersManager } from "@/components/admin/banners-manager";
+import { requireAdmin } from "@/lib/auth/session";
 import { getAllBannersForAdmin } from "@/lib/banners/queries";
 
 export const metadata = { title: "Banner · Admin Kedai Cak Kum" };
 
 export default async function AdminBannersPage() {
+  await requireAdmin();
   const banners = await getAllBannersForAdmin();
 
   const mapped = banners.map((b) => ({

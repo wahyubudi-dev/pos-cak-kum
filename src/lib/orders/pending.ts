@@ -1,5 +1,6 @@
 import { and, desc, eq } from "drizzle-orm";
 
+import { redirect } from "next/navigation";
 import { requireAuth } from "@/lib/auth/session";
 import { db } from "@/lib/db";
 import { carts, cartItems, orders, orderItems, type OrderStatus } from "@/lib/db/schema";
@@ -126,7 +127,7 @@ export async function createOrderFromCartServer(
   };
 }
 
-export async function getPendingPaymentOrder(): Promise<PaymentOrderData | null> {
+export async function reconcilePendingPaymentOrder(): Promise<PaymentOrderData | null> {
   const user = await requireAuth("/checkout");
 
   const order = await db.query.orders.findFirst({
@@ -157,7 +158,7 @@ export async function getPendingPaymentOrder(): Promise<PaymentOrderData | null>
 
   const invoice = await getInvoice(order.paymentReference);
 
-  // If invoice is no longer pending, clean up the order and return null
+  // Reconcile: if invoice is no longer pending, update DB and redirect
   if (invoice.status === "EXPIRED") {
     const cart = await db.query.carts.findFirst({
       columns: { id: true },
@@ -175,7 +176,7 @@ export async function getPendingPaymentOrder(): Promise<PaymentOrderData | null>
       }
     });
 
-    return null;
+    redirect(`/order/cancel?number=${order.orderNumber}`);
   }
 
   const paidStatuses: XenditInvoice["status"][] = ["PAID", "SETTLED"];
@@ -188,7 +189,7 @@ export async function getPendingPaymentOrder(): Promise<PaymentOrderData | null>
       })
       .where(eq(orders.id, order.id));
 
-    return null;
+    redirect(`/order/success?number=${order.orderNumber}`);
   }
 
   const qrImage = await generateQrDataUrl(invoice.qr_string || invoice.invoice_url);

@@ -36,6 +36,7 @@ async function main() {
   const sql = postgres(DATABASE_URL!, {
     prepare: false,
     max: 1,
+    ssl: "require",
     onnotice: () => {},
   });
 

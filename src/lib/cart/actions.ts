@@ -131,9 +131,10 @@ export async function addToCart(formData: FormData): Promise<CartActionState> {
       });
     }
   } catch (error) {
+    console.error("[addToCart]", error);
     return {
       ok: false,
-      message: error instanceof Error ? error.message : "Gagal menambah ke keranjang",
+      message: "Gagal menambah ke keranjang",
     };
   }
 
@@ -188,9 +189,10 @@ export async function updateCartItem(
       })
       .where(eq(cartItems.id, itemId));
   } catch (error) {
+    console.error("[updateCartItem]", error);
     return {
       ok: false,
-      message: error instanceof Error ? error.message : "Gagal memperbarui",
+      message: "Gagal memperbarui",
     };
   }
 
@@ -216,9 +218,10 @@ export async function removeCartItem(
   try {
     await db.delete(cartItems).where(eq(cartItems.id, itemId));
   } catch (error) {
+    console.error("[removeCartItem]", error);
     return {
       ok: false,
-      message: error instanceof Error ? error.message : "Gagal menghapus",
+      message: "Gagal menghapus",
     };
   }
 
@@ -240,9 +243,10 @@ export async function clearCart(): Promise<CartActionState> {
   try {
     await db.delete(cartItems).where(eq(cartItems.cartId, cart.id));
   } catch (error) {
+    console.error("[clearCart]", error);
     return {
       ok: false,
-      message: error instanceof Error ? error.message : "Gagal mengosongkan keranjang",
+      message: "Gagal mengosongkan keranjang",
     };
   }
 

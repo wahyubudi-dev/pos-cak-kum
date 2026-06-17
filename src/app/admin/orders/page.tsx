@@ -1,5 +1,6 @@
 import { OrdersDashboard, type OrderView } from "@/components/admin/orders-dashboard";
 import { Button } from "@/components/ui/button";
+import { requireAdmin } from "@/lib/auth/session";
 import {
   countAllOrdersForAdmin,
   getAllOrdersForAdmin,
@@ -25,6 +26,7 @@ type SearchParams = Promise<{
 export default async function AdminOrdersPage(props: {
   searchParams: SearchParams;
 }) {
+  await requireAdmin();
   const {
     startDate: startParam,
     endDate: endParam,

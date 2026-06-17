@@ -58,10 +58,10 @@ export async function createCategory(
       sortOrder: parsed.value.sort_order,
     });
   } catch (error) {
+    console.error("[createCategory]", error);
     return {
       ok: false,
-      message:
-        error instanceof Error ? error.message : "Gagal membuat kategori",
+      message: "Gagal membuat kategori",
     };
   }
 
@@ -88,9 +88,10 @@ export async function updateCategory(
       })
       .where(eq(categories.id, id));
   } catch (error) {
+    console.error("[updateCategory]", error);
     return {
       ok: false,
-      message: error instanceof Error ? error.message : "Gagal menyimpan",
+      message: "Gagal menyimpan",
     };
   }
 
@@ -105,15 +106,18 @@ export async function deleteCategory(id: string): Promise<CategoryActionState> {
   try {
     await db.delete(categories).where(eq(categories.id, id));
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Gagal menghapus";
-    if (message.includes("23503") || message.includes("foreign key")) {
+    console.error("[deleteCategory]", error);
+    const isFk =
+      error instanceof Error &&
+      (error.message.includes("23503") || error.message.includes("foreign key"));
+    if (isFk) {
       return {
         ok: false,
         message:
           "Kategori masih dipakai oleh menu. Hapus atau pindahkan menu dulu.",
       };
     }
-    return { ok: false, message };
+    return { ok: false, message: "Gagal menghapus" };
   }
 
   revalidatePath("/admin/categories");

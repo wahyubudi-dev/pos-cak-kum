@@ -111,16 +111,6 @@ export async function expireInvoice(
   };
 }
 
-export function verifyWebhook(
-  payload: unknown,
-  callbackToken: string | null,
-): boolean {
-  if (!callbackToken) return true;
-  const token = process.env.XENDIT_WEBHOOK_TOKEN;
-  if (!token) return true;
-  return callbackToken === token;
-}
-
 export async function generateQrDataUrl(text: string): Promise<string> {
   const QRCode = await import("qrcode");
   return QRCode.toDataURL(text, {

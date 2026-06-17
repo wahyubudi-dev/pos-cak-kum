@@ -1,4 +1,5 @@
 import { MenusManager } from "@/components/admin/menus-manager";
+import { requireAdmin } from "@/lib/auth/session";
 import { getAllMenusForAdmin } from "@/lib/menus/queries";
 import { getCategories } from "@/lib/menus/queries";
 
@@ -7,6 +8,7 @@ export const metadata = {
 };
 
 export default async function AdminMenusPage() {
+  await requireAdmin();
   const [menus, categories] = await Promise.all([
     getAllMenusForAdmin(),
     getCategories(),

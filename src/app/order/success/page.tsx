@@ -3,6 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import { Check, Clock, ChefHat, BellRing, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { requireAuth } from "@/lib/auth/session";
 import { getOrderByOrderNumber } from "@/lib/orders/queries";
 import { getInvoice } from "@/lib/payments/xendit";
 import { db } from "@/lib/db";
@@ -29,7 +30,8 @@ export default async function OrderSuccessPage({
   const orderNumber = parseInt(number, 10);
   if (Number.isNaN(orderNumber)) notFound();
 
-  const order = await getOrderByOrderNumber(orderNumber);
+  const user = await requireAuth();
+  const order = await getOrderByOrderNumber(orderNumber, user.auth.id);
   if (!order) notFound();
 
   // Verify Xendit status if still awaiting payment
@@ -52,7 +54,7 @@ export default async function OrderSuccessPage({
     }
 
     // Re-fetch to get updated status
-    const updated = await getOrderByOrderNumber(orderNumber);
+    const updated = await getOrderByOrderNumber(orderNumber, user.auth.id);
     if (updated) Object.assign(order, updated);
   } else if (order.status === "awaiting_payment" && !order.paymentReference) {
     redirect("/checkout");

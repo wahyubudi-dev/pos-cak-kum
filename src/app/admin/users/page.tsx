@@ -9,6 +9,8 @@ export const metadata = {
 export default async function AdminUsersPage() {
   const [admin, users] = await Promise.all([requireAdmin(), getAllUsers()]);
 
+  const masterAdminEmail = process.env.MASTER_ADMIN_EMAIL;
+
   const userViews = users.map((user) => ({
     id: user.id,
     email: user.email,
@@ -16,6 +18,7 @@ export default async function AdminUsersPage() {
     avatarUrl: user.avatarUrl,
     role: user.role,
     createdAt: user.createdAt.toISOString(),
+    isMasterAdmin: user.email === masterAdminEmail,
   }));
 
   return (
@@ -30,11 +33,7 @@ export default async function AdminUsersPage() {
         </p>
       </header>
 
-      <UsersManager
-        users={userViews}
-        currentUserId={admin.auth.id}
-        masterAdminEmail={process.env.MASTER_ADMIN_EMAIL}
-      />
+      <UsersManager users={userViews} currentUserId={admin.auth.id} />
     </div>
   );
 }
