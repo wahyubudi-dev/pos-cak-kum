@@ -16,7 +16,7 @@ const csp = [
   `style-src 'self' 'unsafe-inline'`,
   `img-src 'self' data: blob: https://*.supabase.co https://lh3.googleusercontent.com`,
   `font-src 'self' https://fonts.gstatic.com`,
-  `connect-src 'self' https://*.supabase.co https://api.xendit.co https://accounts.google.com`,
+  `connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.xendit.co https://accounts.google.com`,
   `frame-src 'none'`,
   `object-src 'none'`,
   `base-uri 'none'`,
