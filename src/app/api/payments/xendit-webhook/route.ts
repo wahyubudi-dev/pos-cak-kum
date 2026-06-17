@@ -7,7 +7,7 @@ import { orders } from "@/lib/db/schema";
 type XenditCallback = {
   id: string;
   external_id: string;
-  status: "PENDING" | "SETTLED" | "EXPIRED";
+  status: "PENDING" | "PAID" | "SETTLED" | "EXPIRED";
   paid_at: string | null;
   payment_channel: string | null;
   payment_method: string | null;
@@ -23,7 +23,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "invalid token" }, { status: 401 });
     }
 
-    if (body.status !== "SETTLED") {
+    const paidStatuses: XenditCallback["status"][] = ["PAID", "SETTLED"];
+    if (!paidStatuses.includes(body.status)) {
       return NextResponse.json({ received: true });
     }
 
