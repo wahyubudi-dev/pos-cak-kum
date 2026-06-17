@@ -3,6 +3,8 @@ import { UtensilsCrossed, Coffee, CakeSlice } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 
+export const revalidate = 60;
+
 const FEATURES = [
   { icon: UtensilsCrossed, label: "Mie Yamin & Mie Ayam" },
   { icon: Coffee, label: "Minuman Segar" },

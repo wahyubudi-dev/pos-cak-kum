@@ -113,14 +113,14 @@ function BannerSlide({
         className={`relative flex w-[calc(100%-48px)] min-w-[260px] max-w-[380px] shrink-0 snap-start overflow-hidden rounded-2xl sm:w-[72%] sm:rounded-3xl ${highlightClass}`}
         style={{ minHeight: "150px", aspectRatio: "16/8" }}
       >
-        <Image
-          src={banner.imageUrl!}
-          alt={banner.title}
-          fill
-          loading={eager ? "eager" : undefined}
-          sizes="(min-width: 640px) 380px, 80vw"
-          className="object-cover"
-        />
+          <Image
+            src={banner.imageUrl!}
+            alt={banner.title}
+            fill
+            priority={eager}
+            sizes="(min-width: 640px) 380px, 80vw"
+            className="object-cover"
+          />
       </div>
     );
 
@@ -176,7 +176,7 @@ function BannerSlide({
             src={banner.imageUrl}
             alt=""
             fill
-            loading={eager ? "eager" : undefined}
+            priority={eager}
             sizes="150px"
             className="object-contain object-center"
           />

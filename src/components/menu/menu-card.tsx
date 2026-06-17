@@ -15,7 +15,7 @@ type MenuCardProps = {
  * Single menu tile — full-bleed image dominates, info below.
  * Card stays a Server Component; only AddToCartButton is client.
  */
-export function MenuCard({ menu, isAuthenticated, returnPath }: MenuCardProps) {
+export function MenuCard({ menu, isAuthenticated, returnPath, priority = false }: MenuCardProps) {
   return (
     <article className="group flex flex-col overflow-hidden rounded-3xl border border-border bg-card transition-shadow hover:shadow-subtle">
       {/* Full-bleed image — 4:5 portrait ratio */}
@@ -25,6 +25,7 @@ export function MenuCard({ menu, isAuthenticated, returnPath }: MenuCardProps) {
             src={menu.imageUrl}
             alt={menu.name}
             fill
+            priority={priority}
             sizes="(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw"
             className="object-cover transition-transform duration-300 group-hover:scale-[1.03]"
           />
