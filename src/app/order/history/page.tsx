@@ -286,8 +286,8 @@ function OrderCard({
 
 const STATUS_ACCENT: Record<OrderStatus, string> = {
   awaiting_payment: "#f59e0b",
-  pending_confirmation: "#f59e0b",
-  processing: "#3b82f6",
+  pending_confirmation: "#0ea5e9",
+  processing: "#8b5cf6",
   ready: "#10b981",
   completed: "#9ca3af",
   cancelled: "#ef4444",
@@ -305,8 +305,8 @@ const STATUS_ICONS: Record<OrderStatus, React.ReactNode> = {
 function StatusBadge({ status }: { status: OrderStatus }) {
   const colors: Record<OrderStatus, string> = {
     awaiting_payment: "bg-amber-50 text-amber-700 border-amber-200",
-    pending_confirmation: "bg-amber-50 text-amber-700 border-amber-200",
-    processing: "bg-blue-50 text-blue-700 border-blue-200",
+    pending_confirmation: "bg-sky-50 text-sky-700 border-sky-200",
+    processing: "bg-violet-50 text-violet-700 border-violet-200",
     ready: "bg-emerald-50 text-emerald-700 border-emerald-200",
     completed: "bg-gray-50 text-gray-500 border-gray-200",
     cancelled: "bg-red-50 text-red-700 border-red-200",

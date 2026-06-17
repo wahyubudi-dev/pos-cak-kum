@@ -45,8 +45,8 @@ function abbreviate(value: number): string {
 
 const PIE_COLORS: Record<string, string> = {
   awaiting_payment: "#f59e0b",
-  pending_confirmation: "#f59e0b",
-  processing: "#3b82f6",
+  pending_confirmation: "#0ea5e9",
+  processing: "#8b5cf6",
   ready: "#10b981",
   completed: "#6b7280",
   cancelled: "#ef4444",

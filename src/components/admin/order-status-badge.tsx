@@ -6,11 +6,11 @@ const STATUS_STYLES: Record<OrderStatus, string> = {
   awaiting_payment:
     "bg-cream-paper text-foreground border-border",
   pending_confirmation:
-    "bg-cream-paper text-foreground border-border",
+    "bg-sky-50 text-sky-700 border-sky-200",
   processing:
-    "bg-mint-wash text-foreground border-mint-glow",
+    "bg-violet-50 text-violet-700 border-violet-200",
   ready:
-    "bg-mint-glow text-midnight-ink border-leaf-soft",
+    "bg-emerald-50 text-emerald-700 border-emerald-200",
   completed:
     "bg-foreground text-background border-foreground",
   cancelled:

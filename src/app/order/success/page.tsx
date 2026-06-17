@@ -262,8 +262,8 @@ function StatusDot({ status }: { status: OrderStatus }) {
 
   const colorMap: Record<OrderStatus, string> = {
     awaiting_payment: "bg-amber-400",
-    pending_confirmation: "bg-amber-400",
-    processing: "bg-blue-500",
+    pending_confirmation: "bg-sky-400",
+    processing: "bg-violet-500",
     ready: "bg-emerald-500",
     completed: "bg-brand-teal",
     cancelled: "",
