@@ -51,7 +51,7 @@ export function BannersManager({ banners }: BannersManagerProps) {
               Tambah banner
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto sm:max-h-[90vh] p-5 sm:p-7 gap-5 sm:gap-7 top-[50%] sm:top-[50%]">
+          <DialogContent className="w-[calc(100%-32px)] max-w-2xl max-h-[85vh] overflow-y-auto sm:max-h-[90vh] p-5 sm:p-7 gap-5 sm:gap-7 rounded-2xl">
             <DialogHeader className="pb-0 pr-0">
               <DialogTitle>Tambah banner baru</DialogTitle>
             </DialogHeader>
@@ -106,10 +106,10 @@ function BannerRow({ banner }: { banner: AdminBanner }) {
   }
 
   return (
-    <div className="flex items-center gap-4 rounded-2xl border border-border bg-card p-4">
+    <div className="flex flex-col gap-3 rounded-2xl border border-border bg-card p-4 sm:flex-row sm:items-center sm:gap-4">
       {/* Preview */}
       <div
-        className="relative aspect-video w-28 shrink-0 overflow-hidden rounded-xl"
+        className="relative aspect-video w-full shrink-0 overflow-hidden rounded-xl sm:w-28"
         style={{ background: banner.bg_color }}
       >
         {banner.image_url ? (
@@ -117,7 +117,7 @@ function BannerRow({ banner }: { banner: AdminBanner }) {
             src={banner.image_url}
             alt={banner.title}
             fill
-            sizes="112px"
+            sizes="(max-width: 640px) 100vw, 112px"
             className="object-cover"
           />
         ) : (
@@ -131,32 +131,36 @@ function BannerRow({ banner }: { banner: AdminBanner }) {
 
       {/* Info */}
       <div className="flex flex-1 flex-col gap-1 min-w-0">
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="font-medium text-foreground truncate">
-            {banner.title}
-          </span>
-          <Badge variant="secondary" className="rounded-full capitalize">
+        <span className="font-medium text-foreground truncate">
+          {banner.title}
+        </span>
+        <div className="flex flex-wrap items-center gap-1.5">
+          <Badge variant="secondary" className="rounded-full capitalize shrink-0 text-[10px] leading-none">
             {banner.display_mode}
           </Badge>
           {banner.is_highlighted ? (
-            <Badge className="rounded-full bg-amber-100 text-amber-800">
+            <Badge className="rounded-full bg-amber-100 text-amber-800 shrink-0 text-[10px] leading-none">
               Highlight
             </Badge>
           ) : null}
           {banner.cta_text ? (
-            <Badge variant="outline" className="rounded-full">
+            <Badge variant="outline" className="rounded-full max-w-[160px] truncate shrink-0 text-[10px] leading-none">
               CTA: {banner.cta_text}
             </Badge>
           ) : null}
+          <span className="text-[10px] text-muted-foreground leading-none">
+            Urutan {banner.sort_order}
+          </span>
         </div>
-        <span className="text-xs text-muted-foreground">
-          Urutan: {banner.sort_order}
-          {banner.description ? ` · ${banner.description.slice(0, 50)}...` : ""}
-        </span>
+        {banner.description ? (
+          <span className="text-xs text-muted-foreground truncate">
+            {banner.description.slice(0, 60)}...
+          </span>
+        ) : null}
       </div>
 
       {/* Controls */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center justify-between gap-2 sm:gap-3 sm:justify-end">
         <div className="flex items-center gap-2">
           <Switch
             checked={isActive}
@@ -164,58 +168,60 @@ function BannerRow({ banner }: { banner: AdminBanner }) {
             disabled={isToggling}
             aria-label={isActive ? "Nonaktifkan banner" : "Aktifkan banner"}
           />
-          <span className="text-xs text-muted-foreground">
+          <span className="text-xs text-muted-foreground hidden sm:inline">
             {isActive ? "Aktif" : "Non-aktif"}
           </span>
         </div>
 
-        <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
-          <DialogTrigger asChild>
-            <Button type="button" variant="ghost" size="sm" className="rounded-lg">
-              Edit
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto p-5 sm:p-7 gap-5 sm:gap-7">
-            <DialogHeader>
-              <DialogTitle>Edit banner</DialogTitle>
-            </DialogHeader>
-            <BannerForm
-              defaults={{
-                id: banner.id,
-                title: banner.title,
-                description: banner.description,
-                bg_color: banner.bg_color,
-                image_url: banner.image_url,
-                display_mode: banner.display_mode,
-                cta_text: banner.cta_text,
-                cta_href: banner.cta_href,
-                is_highlighted: banner.is_highlighted,
-                is_active: banner.is_active,
-                sort_order: banner.sort_order,
-              }}
-              onSaved={() => setIsEditOpen(false)}
-            />
-          </DialogContent>
-        </Dialog>
+        <div className="flex items-center gap-1 sm:gap-2">
+          <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
+            <DialogTrigger asChild>
+              <Button type="button" variant="ghost" size="sm" className="rounded-lg h-7 px-2.5 sm:h-9 sm:px-3">
+                Edit
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="w-[calc(100%-32px)] max-w-2xl max-h-[85vh] overflow-y-auto p-5 sm:p-7 gap-5 sm:gap-7 rounded-2xl">
+              <DialogHeader>
+                <DialogTitle>Edit banner</DialogTitle>
+              </DialogHeader>
+              <BannerForm
+                defaults={{
+                  id: banner.id,
+                  title: banner.title,
+                  description: banner.description,
+                  bg_color: banner.bg_color,
+                  image_url: banner.image_url,
+                  display_mode: banner.display_mode,
+                  cta_text: banner.cta_text,
+                  cta_href: banner.cta_href,
+                  is_highlighted: banner.is_highlighted,
+                  is_active: banner.is_active,
+                  sort_order: banner.sort_order,
+                }}
+                onSaved={() => setIsEditOpen(false)}
+              />
+            </DialogContent>
+          </Dialog>
 
-        <ConfirmDialog
-          trigger={
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              className="rounded-lg text-destructive hover:bg-destructive/10 hover:text-destructive"
-              disabled={isDeleting}
-            >
-              {isDeleting ? "..." : "Hapus"}
-            </Button>
-          }
-          title={`Hapus banner "${banner.title}"?`}
-          description="Banner yang dihapus tidak bisa dikembalikan."
-          confirmLabel="Hapus banner"
-          tone="destructive"
-          onConfirm={handleDelete}
-        />
+          <ConfirmDialog
+            trigger={
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="rounded-lg h-7 px-2.5 text-destructive hover:bg-destructive/10 hover:text-destructive sm:h-9 sm:px-3"
+                disabled={isDeleting}
+              >
+                {isDeleting ? "..." : "Hapus"}
+              </Button>
+            }
+            title={`Hapus banner "${banner.title}"?`}
+            description="Banner yang dihapus tidak bisa dikembalikan."
+            confirmLabel="Hapus banner"
+            tone="destructive"
+            onConfirm={handleDelete}
+          />
+        </div>
       </div>
     </div>
   );
