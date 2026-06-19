@@ -61,7 +61,7 @@ export default async function AdminDashboardPage(props: { searchParams: SearchPa
 
       <section className="grid gap-3 sm:grid-cols-3">
         <StatCard
-          label="Pesanan aktif"
+          label="Pesanan aktif (All Order)"
           value={String(activeCount)}
           hint="Menunggu, diproses, atau sedang diantar"
           accent="bg-cream-paper"

@@ -11,7 +11,7 @@ export default function NotFound() {
         <div className="absolute -bottom-32 -right-32 h-80 w-80 rounded-full bg-cream-paper blur-3xl" />
       </div>
 
-      <div className="relative mx-auto flex w-full max-w-sm flex-col items-center gap-7 rounded-3xl border border-mist bg-white px-7 py-12 text-center shadow-subtle sm:px-8 sm:py-14">
+      <div className="relative mx-auto flex w-full max-w-sm flex-col items-center gap-7 rounded-3xl border border-mist bg-white px-7 py-12 text-center shadow-subtle sm:px-7 sm:py-14">
         {/* 404 mark */}
         <div className="flex flex-col items-center gap-2">
           <span
